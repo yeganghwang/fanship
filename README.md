@@ -59,12 +59,20 @@
 | id			 			| int						| NO	| PK	| NO 	|Auto Increment|
 | writer_id			| int						| NO	| FK	| NO	|사용자 아이디(tb_user -> user_id)|
 | title					| varchar(128)	|	NO	|	-		|	NO	|제목|
-| content				| TEXT					|	NO	|	-		|	NO	|내용|
-|	created_at		| timestamp			| NO 	| - 	| NO	|작성일시(CURRENT_TIMESTAMP)|
+| content				| TEXT					|	NO  |	-		|	NO	|내용|
+|	created_at		| timestamp			| NO  | - 	| NO	|작성일시(CURRENT_TIMESTAMP)|
+| notice        | boolean       | YES | -   | NO  |공지여부|
+| visible       | boolean       | NO  |  -  | NO  |삭제여부(삭제시 FALSE)|
 
 
 ### tb_schedule
 - 스케줄
+
+|필드명|형식|Null가능|조건|암호화|설명|
+|---|---|-|-|-|---|
+
+### tb_goods
+- 굿즈 상품
 
 |필드명|형식|Null가능|조건|암호화|설명|
 |---|---|-|-|-|---|
