@@ -94,6 +94,7 @@
 | sold          | boolean      | NO  | -     | NO  |완판여부|
 
 ### tb_login_log
+|필드명|형식|Null가능|조건|암호화|설명
 |---|---|-|-|-|---|
 | id            | int          | NO  | PK    | NO  |Auto Increment|
 | user_id       | int          | NO  | FK    | NO  |tb_user -> user_id|
