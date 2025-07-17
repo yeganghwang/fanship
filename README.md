@@ -63,6 +63,7 @@
 |	created_at		| timestamp			| NO  | - 	| NO	|작성일시(CURRENT_TIMESTAMP)|
 | notice        | boolean       | YES | -   | NO  |공지여부|
 | visible       | boolean       | NO  | -   | NO  |삭제여부(삭제시 FALSE)|
+| views         | int           | NO  | -   | NO  |조회수(Default 0)|
 
 
 ### tb_schedule
@@ -92,6 +93,7 @@
 | amount        | int          | NO  | -     | NO  |수량|
 | visible       | boolean      | NO  | -     | NO  |삭제여부(삭제시 FALSE)|
 | sold          | boolean      | NO  | -     | NO  |완판여부|
+| views         | int           | NO  | -   | NO  |조회수(Default 0)|
 
 ### tb_login_log
 |필드명|형식|Null가능|조건|암호화|설명
@@ -220,7 +222,7 @@ INSERT INTO tb_user_fav (user_id, company_id, celeb_id) VALUES
 
 -- tb_post 샘플 데이터
 INSERT INTO tb_post (writer_id, title, content, created_at, notice, visible) VALUES
-(1, '첫 번째 게시글입니다', '안녕하세요! 팬입니다.', NOW(), FALSE, TRUE),
+(1, '첫 번째 게시글입니다', '<h1>안녕하세요! 팬입니다.</h1>', NOW(), FALSE, TRUE),
 (2, '셀럽의 공지사항', '스케줄 변경이 있습니다.', NOW(), TRUE, TRUE);
 
 -- tb_schedule 샘플 데이터
@@ -292,10 +294,27 @@ INSERT INTO tb_goods (seller_id, seller_type, title, content, price, amount, vis
 
 ---
 
-### 셀럽 목록 조회
+### 회사 소속된 셀럽 목록 조회
 - **GET** `/api/celebs`
 - Query: `company_id=1`
-- Response: 200 OK + 셀럽 리스트
+- Response: 200 OK + 셀럽 정보 배열
+
+---
+
+### 셀럽 상세 조회
+- **GET** `/api/celebs`
+- Query: `celeb_id=2`
+- Response: 200 OK + 셀럽 정보
+```json
+{
+  "nickname": "스타001",
+  "celeb_type": "가수",
+  "company_name": "스타기획사",
+  "ig_url": "https://instagram.com/star001",
+  "pfp_img_url": "http://example.com/pfp1.jpg"
+  "dob": "1995-05-20"
+}
+```
 
 ---
 
@@ -334,8 +353,47 @@ INSERT INTO tb_goods (seller_id, seller_type, title, content, price, amount, vis
 
 ### 게시글 목록 조회
 - **GET** `/api/posts`
-- Query: `notice=true` or `visible=true`
-- Response: 게시글 배열
+- Query: `notice=true`(Option)
+- Response: 200 OK + 게시글 배열
+```json
+[
+  {
+    "post_id": "1",
+    "writer_id": "1",
+    "nickname": "팬001",
+    "title": "첫 번째 게시글입니다"
+    "created_at": "2025-07-17"
+    "views": 7,
+    "notice": false
+  },
+  {
+    "post_id": "2",
+    "writer_id": "2",
+    "nickname": "스타001",
+    "title": "셀럽의 공지사항"
+    "created_at": "2025-07-17"
+    "views": 7,
+    "notice": true
+  }
+]
+```
+---
+
+### 게시글 상세 조회
+- **GET** `/api/posts/{post_id}`
+- Response: 200 OK + 게시글 내용
+```json
+{
+    "post_id": "1",
+    "writer_id": "1",
+    "nickname": "팬001",
+    "title": "첫 번째 게시글입니다"
+    "content": "<h1>안녕하세요! 팬입니다.</h1>"
+    "created_at": "2025-07-17"
+    "views": 7,
+    "notice": true
+}
+```
 
 ---
 
@@ -352,6 +410,7 @@ INSERT INTO tb_goods (seller_id, seller_type, title, content, price, amount, vis
 
 ### 굿즈 등록
 - **POST** `/api/goods`
+- Header: Authorization
 - Body
 ```json
 {
@@ -371,6 +430,16 @@ INSERT INTO tb_goods (seller_id, seller_type, title, content, price, amount, vis
 - **GET** `/api/goods`
 - Query: `seller_id=2`
 - Response: 굿즈 배열
+
+
+---
+
+### 굿즈 상세 조회
+- **GET** `/api/goods`
+- Query: `id=1`
+- Response: 굿즈 정보
+
+```
 
 ---
 
