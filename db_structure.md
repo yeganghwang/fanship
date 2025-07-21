@@ -7,7 +7,7 @@
 | password 		| varchar(255)	| NO	| -			| YES(SHA512)	|패스워드|
 | mail 				| varchar(255)	| NO	| UQ		| NO					|메일주소|
 | nickname 		| varchar(12)		| NO	| UQ		| NO					|닉네임|
-| dob 				| date					| NO	| - 		| NO					|생년월일(YYYY-MM-DD)|
+| dob 				| date					| YES	| - 		| NO					|생년월일(YYYY-MM-DD)|
 | pfp_img_url	| varchar(255) 	| YES	| - 		| NO					|프로필 사진 링크|
 | join_date		| timestamp 		| NO	| - 		| NO					|가입일|
 | ig_url			| varchar(255) 	| YES	| UQ 		| NO					|인스타그램 url|
@@ -110,7 +110,7 @@ CREATE TABLE tb_user (
     password VARCHAR(255) NOT NULL,
     mail VARCHAR(255) NOT NULL UNIQUE,
     nickname VARCHAR(12) NOT NULL UNIQUE,
-    dob DATE NOT NULL,
+    dob DATE,
     pfp_img_url VARCHAR(255),
     join_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ig_url VARCHAR(255) UNIQUE,
