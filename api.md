@@ -5,14 +5,33 @@
 ### 회원가입
 - **POST** `/api/users/register`
 - Body (JSON)
+
+
+| 필드명         | 타입         | 필수 여부 | 설명                  | 비고            |
+| -------------- | ------------ | -------- | -----------------------| ---------------|
+| `username`     | string       | YES      | 로그인 ID             |                  |
+| `password`     | string       | YES      | 비밀번호              |                  |
+| `mail`         | string       | YES      | 이메일 주소           |                  |
+| `nickname`     | string       | YES      | 사용자 닉네임         |                  |
+| `position`     | string       | YES      | 사용자 유형            |                 |
+| `dob`          | string(date) | null     | 생년월일 (YYYY-MM-DD) |                  |
+| `ig_url`       | string       | null     | 인스타그램 URL        |                  |
+| `pfp_img_url`  | string       | null     | 프로필 이미지 URL     |                  |
+| `company_code` | int          | null     | 소속 회사 코드         |                 |
+| `celeb_type`   | string       | null     | 셀럽 유형              |                 |
+
 ```json
 {
-  "username": "string",
-  "password": "string",
-  "mail": "string",
-  "nickname": "string",
-  "dob": "YYYY-MM-DD",
-  "ig_url": "string"
+  "username": "celeb001",
+  "password": "qwer1234",
+  "mail": "celeb1@example.com",
+  "nickname": "스타001",
+  "dob": "1995-05-10",
+  "ig_url": "https://instagram.com/star001",
+  "pfp_img_url": "https://example.com/pfp1.jpg",
+  "position": "celeb",
+  "company_code": 1,
+  "celeb_type": "가수"
 }
 ```
 - Response: 201 Created
@@ -22,10 +41,16 @@
 ### 로그인
 - **POST** `/api/users/login`
 - Body (JSON)
+  
+| 필드명      | 타입    | 필수 여부 | 설명       | 비고     |
+|-------------|---------|-----------|------------|----------|
+| `username`  | string  | YES       | 로그인 ID   |          |
+| `password`  | string  | YES       | 비밀번호    |          |
+  
 ```json
 {
-  "username": "string",
-  "password": "string"
+  "username": "fan001",
+  "password": "qwer1234!!!!"
 }
 ```
 - Response: 200 OK + JWT 토큰
@@ -37,10 +62,10 @@
 - Response
 ```json
 {
-  "user_id": 1,
-  "username": "fan001",
   "nickname": "팬001",
-  "position": "fan"
+  "position": "fan",
+  "pfp_img_url": null,
+  "ig_url": null,
 }
 ```
 
@@ -114,29 +139,31 @@
 
 ### 게시글 목록 조회
 - **GET** `/api/posts`
-- Query: `notice=true`(Option)
+- Query: `notice`(Boolean, Optional)
 - Response: 200 OK + 게시글 배열
 ```json
-[
-  {
-    "post_id": "1",
-    "writer_id": "1",
-    "nickname": "팬001",
-    "title": "첫 번째 게시글입니다"
-    "created_at": "2025-07-17"
-    "views": 7,
-    "notice": false
-  },
-  {
-    "post_id": "2",
-    "writer_id": "2",
-    "nickname": "스타001",
-    "title": "셀럽의 공지사항"
-    "created_at": "2025-07-17"
-    "views": 7,
-    "notice": true
-  }
-]
+{
+  "list": [
+    {
+      "post_id": "1",
+      "writer_id": "1",
+      "nickname": "팬001",
+      "title": "첫 번째 게시글입니다",
+      "created_at": "2025-07-17",
+      "views": 7,
+      "notice": false
+    },
+    {
+      "post_id": "2",
+      "writer_id": "2",
+      "nickname": "스타001",
+      "title": "셀럽의 공지사항",
+      "created_at": "2025-07-17",
+      "views": 7,
+      "notice": true
+    }
+  ]
+}
 ```
 ---
 
@@ -148,9 +175,9 @@
     "post_id": "1",
     "writer_id": "1",
     "nickname": "팬001",
-    "title": "첫 번째 게시글입니다"
-    "content": "<h1>안녕하세요! 팬입니다.</h1>"
-    "created_at": "2025-07-17"
+    "title": "첫 번째 게시글입니다",
+    "content": "<h1>안녕하세요! 팬입니다.</h1>",
+    "created_at": "2025-07-17",
     "views": 7,
     "notice": true
 }
@@ -178,7 +205,7 @@
   "seller_id": 2,
   "seller_type": "celeb",
   "title": "굿즈명",
-  "content": "설명",
+  "content": "<h1>설명은</br><b>HTML</b>입니다.</h1>",
   "price": 19900.000,
   "amount": 100
 }
@@ -191,7 +218,24 @@
 - **GET** `/api/goods`
 - Query: `seller_id=2`
 - Response: 굿즈 배열
-
+```json
+{
+  "list": [
+    {
+      "title": "셀럽 포토북",
+      "price": 19900.000,
+      "amount": 100,
+      "notice": true
+    },
+    {
+      "title": "포토카드 케이스",
+      "price": 49900.000,
+      "amount": 10,
+      "notice": true
+    }
+  ]
+}
+```
 
 ---
 
@@ -199,7 +243,17 @@
 - **GET** `/api/goods`
 - Query: `id=1`
 - Response: 굿즈 정보
-
+```json
+{
+  "company_name": "스타기획사",
+  "celeb_type": "가수",
+  "seller_nickname": "스타001",
+  "title": "셀럽 포토북",
+  "content": "<h1>한정판 포토북입니다.<h1>",
+  "price": 19900.000,
+  "amount": 100,
+  "notice": true
+}
 ```
 
 ---
