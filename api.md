@@ -6,19 +6,18 @@
 - **POST** `/api/users/register`
 - Body (JSON)
 
-
-| 필드명         | 타입         | 필수 여부 | 설명                  | 비고            |
-| -------------- | ------------ | -------- | -----------------------| ---------------|
-| `username`     | string       | YES      | 로그인 ID             |                  |
-| `password`     | string       | YES      | 비밀번호              |                  |
-| `mail`         | string       | YES      | 이메일 주소           |                  |
-| `nickname`     | string       | YES      | 사용자 닉네임         |                  |
-| `position`     | string       | YES      | 사용자 유형            |                 |
-| `dob`          | string(date) | null     | 생년월일 (YYYY-MM-DD) |                  |
-| `ig_url`       | string       | null     | 인스타그램 URL        |                  |
-| `pfp_img_url`  | string       | null     | 프로필 이미지 URL     |                  |
-| `company_code` | int          | null     | 소속 회사 코드         |                 |
-| `celeb_type`   | string       | null     | 셀럽 유형              |                 |
+| 필드명 | 타입 | 필수 여부 | 설명 | 비고 |
+| --- | --- | --- | --- | --- |
+| `username` | string | YES | 로그인 ID | |
+| `password` | string | YES | 비밀번호 | |
+| `mail` | string | YES | 이메일 주소 | |
+| `nickname` | string | YES | 사용자 닉네임 | |
+| `position` | string | YES | 사용자 유형 | |
+| `dob` | string(date) | null | 생년월일 (YYYY-MM-DD) | |
+| `ig_url` | string | null | 인스타그램 URL | |
+| `pfp_img_url` | string | null | 프로필 이미지 URL | |
+| `company_code` | int | null | 소속 회사 코드 | |
+| `celeb_type` | string | null | 셀럽 유형 | |
 
 ```json
 {
@@ -41,12 +40,12 @@
 ### 로그인
 - **POST** `/api/users/login`
 - Body (JSON)
-  
-| 필드명      | 타입    | 필수 여부 | 설명       | 비고     |
-|-------------|---------|-----------|------------|----------|
-| `username`  | string  | YES       | 로그인 ID   |          |
-| `password`  | string  | YES       | 비밀번호    |          |
-  
+
+| 필드명 | 타입 | 필수 여부 | 설명 | 비고 |
+| --- | --- | --- | --- | --- |
+| `username` | string | YES | 로그인 ID | |
+| `password` | string | YES | 비밀번호 | |
+
 ```json
 {
   "username": "fan001",
