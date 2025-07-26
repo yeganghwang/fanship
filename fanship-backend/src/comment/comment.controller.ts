@@ -37,8 +37,9 @@ export class CommentController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('comments/:commentId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteComment(@Param('commentId') commentId: number, @Request() req): Promise<void> {
+  @HttpCode(HttpStatus.OK)
+  async deleteComment(@Param('commentId') commentId: number, @Request() req): Promise<{ message: string }> {
     await this.commentService.deleteComment(commentId, req.user.userId);
+    return { message: '댓글이 성공적으로 삭제되었습니다.' };
   }
 }

@@ -30,14 +30,22 @@ export class CompanyService {
     return this.companyRepository.save(newCompany);
   }
 
-  async findAll(region?: string): Promise<Company[]> {
+  async findAll(region?: string): Promise<any[]> {
     const query = this.companyRepository.createQueryBuilder('company');
 
     if (region) {
       query.where('company.region = :region', { region });
     }
 
-    return query.getMany();
+    const companies = await query.getMany();
+    
+    return companies.map(company => ({
+      id: company.id,
+      company_name: company.company_name,
+      ceo_id: company.ceoId,
+      company_type: company.company_type,
+      region: company.region,
+    }));
   }
 
   async findOneById(companyId: number): Promise<Company | null> {

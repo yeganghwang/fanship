@@ -41,7 +41,7 @@ export class CelebService {
       throw new NotFoundException(`Company with ID ${companyId} not found`);
     }
 
-    return this.celebRepository
+    const celebs = await this.celebRepository
       .createQueryBuilder('celeb')
       .leftJoinAndSelect('celeb.user', 'user')
       .where('celeb.companyId = :companyId', { companyId })
@@ -51,6 +51,12 @@ export class CelebService {
         'celeb.celeb_type',
       ])
       .getMany();
+
+    return celebs.map(celeb => ({
+      celeb_id: celeb.celebId,
+      nickname: celeb.user.nickname,
+      celeb_type: celeb.celeb_type,
+    }));
   }
 
   async findOneById(celebId: number): Promise<any> {
@@ -82,6 +88,10 @@ export class CelebService {
       pfp_img_url: celeb.user.pfp_img_url,
       dob: celeb.user.dob,
     };
+  }
+
+  async findCelebByUserId(userId: number): Promise<Celeb | null> {
+    return this.celebRepository.findOne({ where: { userId } });
   }
 
   async updateCeleb(userId: number, updateCelebDto: UpdateCelebDto): Promise<Celeb> {

@@ -49,13 +49,14 @@
 ```json
 {
   "username": "fan001",
-  "password": "qwer1234!!!!"
+  "password": "qwer1234"
 }
 ```
 - Response: 200 OK + JWT 토큰
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+  "user_id": 1
 }
 ```
 
@@ -188,7 +189,6 @@
 - Body
 ```json
 {
-  "user_id": 1,
   "company_id": 1,
   "celeb_id": 1
 }
@@ -200,7 +200,7 @@
 ### 즐겨찾기 삭제
 - **DELETE** `/api/favorites/{favorite_id}`
 - Header: Authorization
-- Response: 204 No Content
+- Response: 200 OK + 삭제 메시지
 
 ---
 
@@ -286,7 +286,7 @@
       "writer_id": "1",
       "nickname": "팬001",
       "title": "첫 번째 게시글입니다",
-      "created_at": "2025-07-17",
+      "created_at": "2025-07-26T18:06:04.000Z",
       "views": 7,
       "notice": false
     },
@@ -295,7 +295,7 @@
       "writer_id": "2",
       "nickname": "스타001",
       "title": "셀럽의 공지사항",
-      "created_at": "2025-07-17",
+      "created_at": "2025-07-26T18:06:04.000Z",
       "views": 7,
       "notice": true
     }
@@ -314,7 +314,7 @@
     "nickname": "팬001",
     "title": "첫 번째 게시글입니다",
     "content": "<h1>안녕하세요! 팬입니다.</h1>",
-    "created_at": "2025-07-17",
+    "created_at": "2025-07-26T18:06:04.000Z",
     "views": 7,
     "notice": true
 }
@@ -334,13 +334,30 @@
 }
 ```
 - Response: 200 OK + 업데이트된 게시글 정보
+```json
+{
+    "post_id": 12,
+    "writer_id": 22,
+    "title": "수정된 제목",
+    "content": "수정된 내용",
+    "created_at": "2025-07-26T18:06:04.000Z",
+    "notice": true,
+    "visible": true,
+    "views": 5
+}
+```
 
 ---
 
 ### 게시글 삭제
 - **DELETE** `/api/posts/{post_id}`
 - Header: Authorization
-- Response: 204 No Content
+- Response: 200 OK + 응답 메시지
+```json
+{
+    "message": "게시글이 성공적으로 삭제되었습니다."
+}
+```
 
 ---
 
@@ -370,7 +387,7 @@
       "writer_id": 1,
       "nickname": "팬001",
       "content": "첫 번째 댓글입니다.",
-      "created_at": "2025-07-17"
+      "created_at": "2025-07-26T18:06:04.000Z"
     }
   ]
 }
@@ -394,26 +411,54 @@
 ### 댓글 삭제
 - **DELETE** `/api/comments/{comment_id}`
 - Header: Authorization
-- Response: 204 No Content
+- Response: 200 + 응답 메시지
+```json
+{
+    "message": "댓글이 성공적으로 삭제되었습니다."
+}
+```
 
 ---
 
 ## 스케줄
 
+### 셀럽 스케줄 등록
+
+- **POST** `/api/celebs/{celeb_id}/schedules`
+- Header: Authorization (JWT)
+```json
+{
+  "schedule_type": "콘서트",
+  "start_dt": "2025-08-01T19:00:00.000Z",
+  "end_dt": "2025-08-01T21:00:00.000Z"
+}
+```
+- Response: 201 Created + 생성된 스케줄 정보
+
 ### 셀럽 스케줄 조회
 - **GET** `/api/celebs/{celeb_id}/schedules`
-- Response: 200 OK + 일정 목록
+- Response: 200 OK + 스케줄 목록
 ```json
 {
   "list": [
     {
-      "id": 1,
+      "schedule_id": 1,
       "celeb_id": 1,
       "schedule_type": "콘서트",
-      "start_dt": "2025-08-01 19:00:00",
-      "end_dt": "2025-08-01 21:00:00"
+      "start_dt": "2025-08-01T19:00:00.000Z",
+      "end_dt": "2025-08-01T21:00:00.000Z"
     }
   ]
+}
+```
+
+### 3. 셀럽 스케줄 삭제
+- **DELETE** `/api/celebs/schedules/{schedule_id}`
+- Header: Authorization (JWT)
+- Response: 200 OK + 삭제 메시지
+```json
+{
+  "message": "스케줄이 성공적으로 삭제되었습니다."
 }
 ```
 
@@ -434,7 +479,21 @@
   "amount": 100
 }
 ```
-- Response: 201 Created
+- Response: 201 Created + json
+```json
+{
+    "goods_id": 7,
+    "seller_id": 24,
+    "title": "굿즈명",
+    "content": "<h1>설명은</br><b>HTML</b>입니다.</h1>",
+    "price": 19900,
+    "amount": 100,
+    "createdt": "2025-07-26T19:06:54.000Z",
+    "visible": true,
+    "views": 0,
+    "sold": false
+}
+```
 
 ---
 
@@ -446,12 +505,14 @@
 {
   "list": [
     {
+      "goods_id": 7,
       "title": "셀럽 포토북",
       "price": 19900.000,
       "amount": 100,
       "notice": true
     },
     {
+      "goods_id": 8,
       "title": "포토카드 케이스",
       "price": 49900.000,
       "amount": 10,
@@ -494,13 +555,32 @@
 }
 ```
 - Response: 200 OK + 업데이트된 굿즈 정보
+```json
+{
+    "goods_id": 7,
+    "seller_id": 24,
+    "title": "수정된 굿즈명",
+    "content": "수정된 설명",
+    "price": 25000,
+    "amount": 50,
+    "created_at": "2025-07-26T19:06:54.000Z",
+    "visible": true,
+    "views": 2,
+    "sold": false
+}
+```
 
 ---
 
 ### 굿즈 삭제
 - **DELETE** `/api/goods/{id}`
 - Header: Authorization
-- Response: 204 No Content
+- Response: 200 OK + 응답 메시지
+```json
+{
+  "message": "굿즈가 성공적으로 삭제되었습니다."
+}
+```
 
 ---
 
@@ -513,7 +593,7 @@
 {
   "list": [
     {
-      "id": 1,
+      "goods_id": 1,
       "seller_id": 2,
       "title": "셀럽 포토북",
       "content": "한정판 포토북입니다.",

@@ -12,7 +12,7 @@ export class GoodsController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createGoods(@Body() createGoodsDto: CreateGoodsDto, @Request() req): Promise<Goods> {
+  async createGoods(@Body() createGoodsDto: CreateGoodsDto, @Request() req): Promise<any> {
     const sellerId = req.user.userId;
     return this.goodsService.createGoods(sellerId, createGoodsDto);
   }
@@ -34,14 +34,15 @@ export class GoodsController {
     @Param('goodsId') goodsId: number,
     @Body() updateGoodsDto: UpdateGoodsDto,
     @Request() req,
-  ): Promise<Goods> {
+  ): Promise<any> {
     return this.goodsService.updateGoods(goodsId, req.user.userId, updateGoodsDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':goodsId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteGoods(@Param('goodsId') goodsId: number, @Request() req): Promise<void> {
+  @HttpCode(HttpStatus.OK)
+  async deleteGoods(@Param('goodsId') goodsId: number, @Request() req): Promise<{ message: string }> {
     await this.goodsService.deleteGoods(goodsId, req.user.userId);
+    return { message: '굿즈가 성공적으로 삭제되었습니다.' };
   }
 }

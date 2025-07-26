@@ -17,13 +17,13 @@ export class FavoriteService {
     private celebService: CelebService,
   ) {}
 
-  async addFavorite(createFavoriteDto: CreateFavoriteDto): Promise<Favorite> {
-    const { userId, companyId, celebId } = createFavoriteDto;
+  async addFavorite(createFavoriteDto: CreateFavoriteDto, userId: number): Promise<Favorite> {
+    const { company_id, celeb_id } = createFavoriteDto;
 
-    if (!companyId && !celebId) {
-      throw new BadRequestException('Either companyId or celebId must be provided.');
+    if (!company_id && !celeb_id) {
+      throw new BadRequestException('Either company_id or celeb_id must be provided.');
     }
-    if (companyId && celebId) {
+    if (company_id && celeb_id) {
       throw new BadRequestException('Cannot add both company and celeb as favorite at the same time.');
     }
 
@@ -33,32 +33,36 @@ export class FavoriteService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    // companyId 존재 여부 확인
-    if (companyId) {
-      const company = await this.companyService.findOneById(companyId);
+    // company_id 존재 여부 확인
+    if (company_id) {
+      const company = await this.companyService.findOneById(company_id);
       if (!company) {
-        throw new NotFoundException(`Company with ID ${companyId} not found`);
+        throw new NotFoundException(`Company with ID ${company_id} not found`);
       }
     }
 
-    // celebId 존재 여부 확인
-    if (celebId) {
-      const celeb = await this.celebService.findOneById(celebId);
+    // celeb_id 존재 여부 확인
+    if (celeb_id) {
+      const celeb = await this.celebService.findOneById(celeb_id);
       if (!celeb) {
-        throw new NotFoundException(`Celeb with ID ${celebId} not found`);
+        throw new NotFoundException(`Celeb with ID ${celeb_id} not found`);
       }
     }
 
     // 중복 즐겨찾기 확인
     const existingFavorite = await this.favoriteRepository.findOne({
-      where: { userId, companyId, celebId },
+      where: { userId, companyId: company_id, celebId: celeb_id },
     });
 
     if (existingFavorite) {
       throw new ConflictException('Favorite already exists.');
     }
 
-    const newFavorite = this.favoriteRepository.create(createFavoriteDto);
+    const newFavorite = this.favoriteRepository.create({
+      userId,
+      companyId: company_id,
+      celebId: celeb_id,
+    });
     return this.favoriteRepository.save(newFavorite);
   }
 
@@ -69,14 +73,6 @@ export class FavoriteService {
       .leftJoinAndSelect('favorite.celeb', 'celeb')
       .leftJoinAndSelect('celeb.user', 'celebUser')
       .where('favorite.userId = :userId', { userId })
-      .select([
-        'favorite.id',
-        'favorite.userId',
-        'favorite.companyId',
-        'favorite.celebId',
-        'company.company_name',
-        'celebUser.nickname',
-      ])
       .getMany();
 
     return favorites.map(fav => ({

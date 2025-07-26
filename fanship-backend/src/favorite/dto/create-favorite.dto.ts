@@ -1,15 +1,11 @@
-import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsInt, IsOptional } from 'class-validator';
 
 export class CreateFavoriteDto {
-  @IsInt()
   @IsOptional()
-  userId: number;
+  @IsInt()
+  company_id?: number;
 
   @IsOptional()
   @IsInt()
-  companyId?: number;
-
-  @IsOptional()
-  @IsInt()
-  celebId?: number;
+  celeb_id?: number;
 }

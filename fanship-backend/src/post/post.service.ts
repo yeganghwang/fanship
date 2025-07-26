@@ -29,15 +29,6 @@ export class PostService {
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.writer', 'user')
-      .select([
-        'post.id',
-        'post.writerId',
-        'user.nickname',
-        'post.title',
-        'post.createdAt',
-        'post.views',
-        'post.notice',
-      ])
       .where('post.visible = :visible', { visible: true });
 
     if (notice !== undefined) {
@@ -46,7 +37,17 @@ export class PostService {
 
     query.orderBy('post.createdAt', 'DESC');
 
-    return query.getMany();
+    const posts = await query.getMany();
+
+    return posts.map(post => ({
+      post_id: post.id,
+      writer_id: post.writerId,
+      nickname: post.writer.nickname,
+      title: post.title,
+      created_at: post.createdAt.toISOString(),
+      views: post.views,
+      notice: post.notice,
+    }));
   }
 
   async findOneById(postId: number): Promise<any> {
@@ -130,8 +131,11 @@ export class PostService {
     }));
   }
 
-  async updatePost(postId: number, userId: number, updatePostDto: UpdatePostDto): Promise<Post> {
-    const post = await this.postRepository.findOne({ where: { id: postId, visible: true } });
+  async updatePost(postId: number, userId: number, updatePostDto: UpdatePostDto): Promise<any> {
+    const post = await this.postRepository.findOne({ 
+      where: { id: postId, visible: true },
+      relations: ['writer']
+    });
 
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found or not visible`);
@@ -142,7 +146,18 @@ export class PostService {
     }
 
     Object.assign(post, updatePostDto);
-    return this.postRepository.save(post);
+    const updatedPost = await this.postRepository.save(post);
+
+    return {
+      post_id: updatedPost.id,
+      writer_id: updatedPost.writerId,
+      nickname: updatedPost.writer.nickname,
+      title: updatedPost.title,
+      content: updatedPost.content,
+      created_at: updatedPost.createdAt,
+      views: updatedPost.views,
+      notice: updatedPost.notice,
+    };
   }
 }
 

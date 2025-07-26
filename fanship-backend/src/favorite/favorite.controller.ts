@@ -12,14 +12,14 @@ export class FavoriteController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async addFavorite(@Body() createFavoriteDto: CreateFavoriteDto, @Request() req): Promise<Favorite> {
-    createFavoriteDto.userId = req.user.userId;
-    return this.favoriteService.addFavorite(createFavoriteDto);
+    return this.favoriteService.addFavorite(createFavoriteDto, req.user.userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':favoriteId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteFavorite(@Param('favoriteId') favoriteId: number, @Request() req): Promise<void> {
+  @HttpCode(HttpStatus.OK)
+  async deleteFavorite(@Param('favoriteId') favoriteId: number, @Request() req): Promise<{ message: string }> {
     await this.favoriteService.deleteFavorite(favoriteId, req.user.userId);
+    return { message: '즐겨찾기가 성공적으로 삭제되었습니다.' };
   }
 }

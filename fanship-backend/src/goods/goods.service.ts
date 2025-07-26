@@ -15,32 +15,46 @@ export class GoodsService {
     private goodsRepository: Repository<Goods>,
   ) {}
 
-  async createGoods(sellerId: number, createGoodsDto: CreateGoodsDto): Promise<Goods> {
+  async createGoods(sellerId: number, createGoodsDto: CreateGoodsDto): Promise<any> {
     const newGoods = this.goodsRepository.create({
       ...createGoodsDto,
       sellerId,
     });
-    return this.goodsRepository.save(newGoods);
+    const savedGoods = await this.goodsRepository.save(newGoods);
+
+    return {
+      goods_id: savedGoods.id,
+      seller_id: savedGoods.sellerId,
+      title: savedGoods.title,
+      content: savedGoods.content,
+      price: savedGoods.price,
+      amount: savedGoods.amount,
+      createdt: savedGoods.createdAt,
+      visible: savedGoods.visible,
+      views: savedGoods.views,
+      sold: savedGoods.sold,
+    };
   }
 
   async findAll(sellerId?: number): Promise<any[]> {
     const query = this.goodsRepository
       .createQueryBuilder('goods')
       .leftJoinAndSelect('goods.seller', 'user')
-      .select([
-        'goods.title',
-        'goods.price',
-        'goods.amount',
-        'goods.visible',
-        'goods.sold',
-      ])
       .where('goods.visible = :visible', { visible: true });
 
     if (sellerId !== undefined) {
       query.andWhere('goods.sellerId = :sellerId', { sellerId });
     }
 
-    return query.getMany();
+    const goods = await query.getMany();
+
+    return goods.map(item => ({
+      goods_id: item.id,
+      title: item.title,
+      price: Number(item.price),
+      amount: item.amount,
+      notice: item.visible,
+    }));
   }
 
   async findOneById(goodsId: number): Promise<any> {
@@ -79,7 +93,7 @@ export class GoodsService {
       seller_nickname: goods.seller.nickname,
       title: goods.title,
       content: goods.content,
-      price: goods.price,
+      price: Number(goods.price),
       amount: goods.amount,
       notice: goods.visible,
     };
@@ -100,7 +114,7 @@ export class GoodsService {
     await this.goodsRepository.save(goods);
   }
 
-  async updateGoods(goodsId: number, userId: number, updateGoodsDto: UpdateGoodsDto): Promise<Goods> {
+  async updateGoods(goodsId: number, userId: number, updateGoodsDto: UpdateGoodsDto): Promise<any> {
     const goods = await this.goodsRepository.findOne({ where: { id: goodsId, visible: true } });
 
     if (!goods) {
@@ -112,7 +126,20 @@ export class GoodsService {
     }
 
     Object.assign(goods, updateGoodsDto);
-    return this.goodsRepository.save(goods);
+    const updatedGoods = await this.goodsRepository.save(goods);
+
+    return {
+      goods_id: updatedGoods.id,
+      seller_id: updatedGoods.sellerId,
+      title: updatedGoods.title,
+      content: updatedGoods.content,
+      price: Number(updatedGoods.price),
+      amount: updatedGoods.amount,
+      created_at: updatedGoods.createdAt,
+      visible: updatedGoods.visible,
+      views: updatedGoods.views,
+      sold: updatedGoods.sold,
+    };
   }
 
   async findGoodsByUserId(userId: number): Promise<any[]> {
@@ -138,11 +165,11 @@ export class GoodsService {
     console.log('Fetched goods:', goods);
 
     return goods.map(item => ({
-      id: item.id,
+      goods_id: item.id,
       seller_id: item.sellerId,
       title: item.title,
       content: item.content,
-      price: item.price,
+      price: Number(item.price),
       amount: item.amount,
       visible: item.visible,
       sold: item.sold,

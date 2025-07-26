@@ -32,24 +32,26 @@ export class CommentService {
     return this.commentRepository.save(newComment);
   }
 
-  async findCommentsByPostId(postId: number): Promise<Comment[]> {
+  async findCommentsByPostId(postId: number): Promise<any[]> {
     const post = await this.postService.findOneById(postId);
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
-    return this.commentRepository.find({
+    
+    const comments = await this.commentRepository.find({
       where: { postId, visible: true },
       relations: ['writer'],
-      select: {
-        id: true,
-        postId: true,
-        writerId: true,
-        content: true,
-        createdAt: true,
-        writer: { nickname: true },
-      },
       order: { createdAt: 'ASC' },
     });
+
+    return comments.map(comment => ({
+      comment_id: comment.id,
+      post_id: comment.postId,
+      writer_id: comment.writerId,
+      nickname: comment.writer.nickname,
+      content: comment.content,
+      created_at: comment.createdAt.toISOString().split('T')[0], // YYYY-MM-DD 형식
+    }));
   }
 
   async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
