@@ -1,0 +1,18 @@
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
+import { FavoriteService } from './favorite.service';
+import { CreateFavoriteDto } from './dto/create-favorite.dto';
+import { Favorite } from './favorite.entity';
+import { AuthGuard } from '@nestjs/passport';
+
+@Controller('favorites')
+export class FavoriteController {
+  constructor(private readonly favoriteService: FavoriteService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async addFavorite(@Body() createFavoriteDto: CreateFavoriteDto, @Request() req): Promise<Favorite> {
+    createFavoriteDto.userId = req.user.userId;
+    return this.favoriteService.addFavorite(createFavoriteDto);
+  }
+}

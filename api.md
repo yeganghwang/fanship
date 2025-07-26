@@ -16,7 +16,7 @@
 | `dob` | string(date) | null | 생년월일 (YYYY-MM-DD) | |
 | `ig_url` | string | null | 인스타그램 URL | |
 | `pfp_img_url` | string | null | 프로필 이미지 URL | |
-| `company_code` | int | null | 소속 회사 코드 | |
+| `company_id` | int | null | 소속 회사 ID | |
 | `celeb_type` | string | null | 셀럽 유형 | |
 
 ```json
@@ -29,7 +29,7 @@
   "ig_url": "https://instagram.com/star001",
   "pfp_img_url": "https://example.com/pfp1.jpg",
   "position": "celeb",
-  "company_code": 1,
+  "company_id": 1,
   "celeb_type": "가수"
 }
 ```
@@ -53,6 +53,11 @@
 }
 ```
 - Response: 200 OK + JWT 토큰
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+}
+```
 
 ---
 
@@ -64,9 +69,38 @@
   "nickname": "팬001",
   "position": "fan",
   "pfp_img_url": null,
-  "ig_url": null,
+  "ig_url": null
 }
 ```
+
+---
+
+### 사용자 정보 수정
+- **PATCH** `/api/users/{user_id}`
+- Header: Authorization
+- Body (JSON)
+
+| 필드명 | 타입 | 필수 여부 | 설명 | 비고 |
+| --- | --- | --- | --- | --- |
+| `nickname` | string | null | 사용자 닉네임 | |
+| `password` | string | null | 비밀번호 | 비밀번호 변경 시 |
+| `pfp_img_url` | string | null | 프로필 이미지 URL | |
+| `ig_url` | string | null | 인스타그램 URL | |
+
+```json
+{
+  "nickname": "새로운닉네임",
+  "pfp_img_url": "https://example.com/new_pfp.jpg"
+}
+```
+- Response: 200 OK + 업데이트된 사용자 정보
+
+---
+
+### 사용자 삭제
+- **DELETE** `/api/users/{user_id}`
+- Header: Authorization
+- Response: 204 No Content
 
 ---
 
@@ -76,19 +110,41 @@
 - **GET** `/api/companies`
 - Query: `region=서울`
 - Response: 200 OK + 회사 리스트
+```json
+{
+  "list": [
+    {
+      "id": 1,
+      "company_name": "스타기획사",
+      "ceo_id": 3,
+      "company_type": "기획사",
+      "region": "서울"
+    }
+  ]
+}
+```
 
 ---
 
 ### 회사 소속된 셀럽 목록 조회
-- **GET** `/api/celebs`
-- Query: `company_id=1`
+- **GET** `/api/companies/{company_id}/celebs`
 - Response: 200 OK + 셀럽 정보 배열
+```json
+{
+  "list": [
+    {
+      "celeb_id": 1,
+      "nickname": "스타001",
+      "celeb_type": "가수"
+    }
+  ]
+}
+```
 
 ---
 
 ### 셀럽 상세 조회
-- **GET** `/api/celebs`
-- Query: `celeb_id=2`
+- **GET** `/api/celebs/{celeb_id}`
 - Response: 200 OK + 셀럽 정보
 ```json
 {
@@ -96,7 +152,7 @@
   "celeb_type": "가수",
   "company_name": "스타기획사",
   "ig_url": "https://instagram.com/star001",
-  "pfp_img_url": "http://example.com/pfp1.jpg"
+  "pfp_img_url": "http://example.com/pfp1.jpg",
   "dob": "1995-05-20"
 }
 ```
@@ -116,6 +172,66 @@
 }
 ```
 - Response: 201 Created
+
+---
+
+### 즐겨찾기 삭제
+- **DELETE** `/api/favorites/{favorite_id}`
+- Header: Authorization
+- Response: 204 No Content
+
+---
+
+### 사용자의 즐겨찾기 목록 조회
+- **GET** `/api/users/{user_id}/favorites`
+- Header: Authorization
+- Response: 200 OK + 즐겨찾기 목록
+
+```json
+{
+  "list": [
+    {
+      "favorite_id": 1,
+      "user_id": 1,
+      "company_id": 1,
+      "celeb_id": null,
+      "company_name": "스타기획사",
+      "celeb_nickname": null
+    },
+    {
+      "favorite_id": 2,
+      "user_id": 1,
+      "company_id": null,
+      "celeb_id": 1,
+      "company_name": null,
+      "celeb_nickname": "스타001"
+    }
+  ]
+}
+```
+
+---
+
+### 사용자가 작성한 게시글 목록 조회
+- **GET** `/api/users/{user_id}/posts`
+- Header: Authorization
+- Response: 200 OK + 게시글 배열 (사용자가 작성한 게시글 목록)
+
+```json
+{
+  "list": [
+    {
+      "post_id": "1",
+      "writer_id": "1",
+      "nickname": "팬001",
+      "title": "내가 쓴 첫 번째 게시글",
+      "created_at": "2025-07-17",
+      "views": 10,
+      "notice": false
+    }
+  ]
+}
+```
 
 ---
 
@@ -184,12 +300,100 @@
 
 ---
 
+### 게시글 수정
+- **PATCH** `/api/posts/{post_id}`
+- Header: Authorization
+- Body
+```json
+{
+  "title": "수정된 제목",
+  "content": "수정된 내용",
+  "notice": true
+}
+```
+- Response: 200 OK + 업데이트된 게시글 정보
+
+---
+
+### 게시글 삭제
+- **DELETE** `/api/posts/{post_id}`
+- Header: Authorization
+- Response: 204 No Content
+
+---
+
+### 댓글 작성
+- **POST** `/api/posts/{post_id}/comments`
+- Header: Authorization
+- Body (JSON)
+```json
+{
+  "content": "댓글 내용"
+}
+```
+- Response: 201 Created + 생성된 댓글 정보
+
+---
+
+### 댓글 목록 조회
+- **GET** `/api/posts/{post_id}/comments`
+- Response: 200 OK + 댓글 목록
+
+```json
+{
+  "list": [
+    {
+      "comment_id": 1,
+      "post_id": 1,
+      "writer_id": 1,
+      "nickname": "팬001",
+      "content": "첫 번째 댓글입니다.",
+      "created_at": "2025-07-17"
+    }
+  ]
+}
+```
+
+---
+
+### 댓글 수정
+- **PATCH** `/api/comments/{comment_id}`
+- Header: Authorization
+- Body (JSON)
+```json
+{
+  "content": "수정된 댓글 내용"
+}
+```
+- Response: 200 OK + 업데이트된 댓글 정보
+
+---
+
+### 댓글 삭제
+- **DELETE** `/api/comments/{comment_id}`
+- Header: Authorization
+- Response: 204 No Content
+
+---
+
 ## 스케줄
 
 ### 셀럽 스케줄 조회
-- **GET** `/api/schedules`
-- Query: `celeb_id=1`
+- **GET** `/api/celebs/{celeb_id}/schedules`
 - Response: 200 OK + 일정 목록
+```json
+{
+  "list": [
+    {
+      "id": 1,
+      "celeb_id": 1,
+      "schedule_type": "콘서트",
+      "start_dt": "2025-08-01 19:00:00",
+      "end_dt": "2025-08-01 21:00:00"
+    }
+  ]
+}
+```
 
 ---
 
@@ -202,7 +406,6 @@
 ```json
 {
   "seller_id": 2,
-  "seller_type": "celeb",
   "title": "굿즈명",
   "content": "<h1>설명은</br><b>HTML</b>입니다.</h1>",
   "price": 19900.000,
@@ -239,8 +442,7 @@
 ---
 
 ### 굿즈 상세 조회
-- **GET** `/api/goods`
-- Query: `id=1`
+- **GET** `/api/goods/{id}`
 - Response: 굿즈 정보
 ```json
 {
@@ -248,12 +450,35 @@
   "celeb_type": "가수",
   "seller_nickname": "스타001",
   "title": "셀럽 포토북",
-  "content": "<h1>한정판 포토북입니다.<h1>",
+  "content": "<h1>한정판 포토북입니다.</h1>",
   "price": 19900.000,
   "amount": 100,
   "notice": true
 }
 ```
+
+---
+
+### 굿즈 수정
+- **PATCH** `/api/goods/{id}`
+- Header: Authorization
+- Body
+```json
+{
+  "title": "수정된 굿즈명",
+  "content": "수정된 설명",
+  "price": 25000.000,
+  "amount": 50
+}
+```
+- Response: 200 OK + 업데이트된 굿즈 정보
+
+---
+
+### 굿즈 삭제
+- **DELETE** `/api/goods/{id}`
+- Header: Authorization
+- Response: 204 No Content
 
 ---
 
