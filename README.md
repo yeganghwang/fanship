@@ -11,4 +11,5 @@
   - 로그인 기록 확인
 - 데이터베이스 명세 : [db_structure.md](db_structure.md)
 - REST API 명세 : [api.md](api.md)
+- 진행상황 : [progress.md](progress.md)
 ---
