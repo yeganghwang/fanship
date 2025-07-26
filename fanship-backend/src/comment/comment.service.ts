@@ -15,8 +15,8 @@ export class CommentService {
     private userService: UserService,
   ) {}
 
-  async createComment(createCommentDto: CreateCommentDto): Promise<Comment> {
-    const { postId, writerId, content } = createCommentDto;
+  async createComment(postId: number, writerId: number, createCommentDto: CreateCommentDto): Promise<Comment> {
+    const { content } = createCommentDto;
 
     const post = await this.postService.findOneById(postId);
     if (!post) {

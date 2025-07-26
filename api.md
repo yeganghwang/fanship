@@ -106,6 +106,28 @@
 
 ## 회사 / 셀럽
 
+### 회사 등록
+- **POST** `/api/companies`
+- Header: Authorization (CEO 권한 필요)
+- Body (JSON)
+
+| 필드명 | 타입 | 필수 여부 | 설명 | 비고 |
+| --- | --- | --- | --- | --- |
+| `company_name` | string | YES | 회사명 | |
+| `company_type` | string | YES | 회사 형태 | |
+| `region` | string | YES | 지역명 | |
+
+```json
+{
+  "company_name": "새로운기획사",
+  "company_type": "엔터테인먼트",
+  "region": "부산"
+}
+```
+- Response: 201 Created + 생성된 회사 정보
+
+---
+
 ### 회사 목록 조회
 - **GET** `/api/companies`
 - Query: `region=서울`

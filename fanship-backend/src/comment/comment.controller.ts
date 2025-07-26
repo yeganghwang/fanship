@@ -16,9 +16,7 @@ export class CommentController {
     @Body() createCommentDto: CreateCommentDto,
     @Request() req,
   ): Promise<Comment> {
-    createCommentDto.postId = postId;
-    createCommentDto.writerId = req.user.userId;
-    return this.commentService.createComment(createCommentDto);
+    return this.commentService.createComment(Number(postId), Number(req.user.userId), createCommentDto);
   }
 
   @Get('posts/:postId/comments')

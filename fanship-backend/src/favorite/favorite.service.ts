@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Favorite } from './favorite.entity';
@@ -87,5 +87,19 @@ export class FavoriteService {
       company_name: fav.company?.company_name || null,
       celeb_nickname: fav.celeb?.user?.nickname || null,
     }));
+  }
+
+  async deleteFavorite(favoriteId: number, userId: number): Promise<void> {
+    const favorite = await this.favoriteRepository.findOne({ where: { id: favoriteId } });
+
+    if (!favorite) {
+      throw new NotFoundException(`Favorite with ID ${favoriteId} not found`);
+    }
+
+    if (favorite.userId !== userId) {
+      throw new ForbiddenException('You are not authorized to delete this favorite');
+    }
+
+    await this.favoriteRepository.remove(favorite);
   }
 }
