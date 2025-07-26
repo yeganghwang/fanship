@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Unique, OneToOne, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Unique, OneToOne, OneToMany } from 'typeorm';
 import { Celeb } from '../celeb/celeb.entity';
-import { Company } from '../company/company.entity';
 import { Comment } from '../comment/comment.entity';
+import { Goods } from '../goods/goods.entity';
 
 @Entity('tb_user')
 @Unique(['username'])
@@ -39,19 +39,12 @@ export class User {
   @Column({ length: 31, nullable: false })
   position: string;
 
-  @Column({ name: 'company_id', type: 'int', nullable: true })
-  company_id: number | null;
-
-  @Column({ name: 'celeb_type', type: 'varchar', length: 64, nullable: true })
-  celeb_type: string | null;
-
   @OneToOne(() => Celeb, celeb => celeb.user)
   celeb: Celeb;
 
-  @ManyToOne(() => Company)
-  @JoinColumn({ name: 'company_id' })
-  company: Company;
-
   @OneToMany(() => Comment, comment => comment.writer)
   comments: Comment[];
+
+  @OneToMany(() => Goods, goods => goods.seller)
+  goods: Goods[];
 }

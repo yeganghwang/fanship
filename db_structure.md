@@ -88,6 +88,7 @@
 | content | TEXT | NO | - | NO | 내용 |
 | price | decimal(12,3) | NO | - | NO | 가격(0~999999999.999 |
 | amount | int | NO | - | NO | 수량 |
+| created_at | timestamp | NO | - | NO | 생성일시(CURRENT_TIMESTAMP) |
 | visible | boolean | NO | - | NO | 삭제여부(삭제시 FALSE) |
 | sold | boolean | NO | - | NO | 완판여부 |
 | views | int | NO | - | NO | 조회수(Default 0) |
@@ -180,6 +181,7 @@ CREATE TABLE tb_goods (
     content TEXT NOT NULL,
     price DECIMAL(12,3) NOT NULL,
     amount INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     visible BOOLEAN NOT NULL DEFAULT TRUE,
     views INT NOT NULL DEFAULT 0,
     sold BOOLEAN NOT NULL DEFAULT FALSE,
@@ -227,9 +229,9 @@ INSERT INTO tb_schedule (celeb_id, schedule_type, start_dt, end_dt) VALUES
 (1, '콘서트', '2025-08-01 19:00:00', '2025-08-01 21:00:00');
 
 -- tb_goods 샘플 데이터
-INSERT INTO tb_goods (seller_id, title, content, price, amount, visible, sold) VALUES
-('2', '셀럽 포토북', '한정판 포토북입니다.', 19900.000, 100, TRUE, FALSE),
-('3', '굿즈 패키지', '팬들을 위한 종합 굿즈 패키지입니다.', 49900.000, 50, TRUE, FALSE);
+INSERT INTO tb_goods (seller_id, title, content, price, amount, visible, sold, created_at) VALUES
+('2', '셀럽 포토북', '한정판 포토북입니다.', 19900.000, 100, TRUE, FALSE, NOW()),
+('3', '굿즈 패키지', '팬들을 위한 종합 굿즈 패키지입니다.', 49900.000, 50, TRUE, FALSE, NOW());
 
 -- tb_comment
 | 필드명 | 형식 | Null 가능 | 조건 | 암호화 | 설명 |

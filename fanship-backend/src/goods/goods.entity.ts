@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 
 @Entity('tb_goods') // 테이블 이름 지정
@@ -24,6 +24,9 @@ export class Goods {
 
   @Column({ type: 'int', nullable: false })
   amount: number;
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
+  createdAt: Date;
 
   @Column({ type: 'boolean', nullable: false, default: true })
   visible: boolean;

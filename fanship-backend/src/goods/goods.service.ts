@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Goods } from './goods.entity';
 import { CreateGoodsDto } from './dto/create-goods.dto';
+import { UpdateGoodsDto } from './dto/update-goods.dto';
 import { User } from '../user/user.entity';
 import { Company } from '../company/company.entity';
 import { Celeb } from '../celeb/celeb.entity';
@@ -97,5 +98,55 @@ export class GoodsService {
 
     goods.visible = false;
     await this.goodsRepository.save(goods);
+  }
+
+  async updateGoods(goodsId: number, userId: number, updateGoodsDto: UpdateGoodsDto): Promise<Goods> {
+    const goods = await this.goodsRepository.findOne({ where: { id: goodsId, visible: true } });
+
+    if (!goods) {
+      throw new NotFoundException(`Goods with ID ${goodsId} not found or not visible`);
+    }
+
+    if (goods.sellerId !== userId) {
+      throw new ForbiddenException('You are not authorized to update this goods');
+    }
+
+    Object.assign(goods, updateGoodsDto);
+    return this.goodsRepository.save(goods);
+  }
+
+  async findGoodsByUserId(userId: number): Promise<any[]> {
+    const goods = await this.goodsRepository
+      .createQueryBuilder('goods')
+      .leftJoinAndSelect('goods.seller', 'user')
+      .where('goods.sellerId = :userId', { userId })
+      .andWhere('goods.visible = :visible', { visible: true })
+      .select([
+        'goods.id',
+        'goods.sellerId',
+        'goods.title',
+        'goods.content',
+        'goods.price',
+        'goods.amount',
+        'goods.visible',
+        'goods.sold',
+        'goods.views',
+      ])
+      .orderBy('goods.createdAt', 'DESC')
+      .getMany();
+
+    console.log('Fetched goods:', goods);
+
+    return goods.map(item => ({
+      id: item.id,
+      seller_id: item.sellerId,
+      title: item.title,
+      content: item.content,
+      price: item.price,
+      amount: item.amount,
+      visible: item.visible,
+      sold: item.sold,
+      views: item.views,
+    }));
   }
 }

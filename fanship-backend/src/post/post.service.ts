@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from './post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
 
@@ -128,4 +129,20 @@ export class PostService {
       notice: post.notice,
     }));
   }
+
+  async updatePost(postId: number, userId: number, updatePostDto: UpdatePostDto): Promise<Post> {
+    const post = await this.postRepository.findOne({ where: { id: postId, visible: true } });
+
+    if (!post) {
+      throw new NotFoundException(`Post with ID ${postId} not found or not visible`);
+    }
+
+    if (post.writerId !== userId) {
+      throw new ForbiddenException('You are not authorized to update this post');
+    }
+
+    Object.assign(post, updatePostDto);
+    return this.postRepository.save(post);
+  }
 }
+

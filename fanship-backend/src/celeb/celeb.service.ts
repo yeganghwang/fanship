@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Celeb } from './celeb.entity';
 import { User } from '../user/user.entity';
 import { Company } from '../company/company.entity';
 import { CompanyService } from '../company/company.service';
+import { CreateCelebDto, UpdateCelebDto } from './dto/create-celeb.dto';
 
 @Injectable()
 export class CelebService {
@@ -13,6 +14,26 @@ export class CelebService {
     private celebRepository: Repository<Celeb>,
     private companyService: CompanyService,
   ) {}
+
+  async createCeleb(createCelebDto: CreateCelebDto): Promise<Celeb> {
+    const { userId, companyId, celebType } = createCelebDto;
+
+    if (companyId === null || companyId === undefined) {
+      throw new BadRequestException('companyId is required for celeb creation');
+    }
+    if (celebType === null || celebType === undefined) {
+      throw new BadRequestException('celebType is required for celeb creation');
+    }
+
+    // 회사 존재 여부 확인
+    const company = await this.companyService.findOneById(companyId);
+    if (!company) {
+      throw new NotFoundException(`Company with ID ${companyId} not found`);
+    }
+
+    const newCeleb = this.celebRepository.create({ userId, companyId, celeb_type: celebType });
+    return this.celebRepository.save(newCeleb);
+  }
 
   async findCelebsByCompanyId(companyId: number): Promise<any[]> {
     const company = await this.companyService.findOneById(companyId);
@@ -61,5 +82,27 @@ export class CelebService {
       pfp_img_url: celeb.user.pfp_img_url,
       dob: celeb.user.dob,
     };
+  }
+
+  async updateCeleb(userId: number, updateCelebDto: UpdateCelebDto): Promise<Celeb> {
+    const celeb = await this.celebRepository.findOne({ where: { userId } });
+
+    if (!celeb) {
+      throw new NotFoundException(`Celeb for user ID ${userId} not found`);
+    }
+
+    if (updateCelebDto.companyId !== undefined && updateCelebDto.companyId !== null) {
+      const company = await this.companyService.findOneById(updateCelebDto.companyId);
+      if (!company) {
+        throw new NotFoundException(`Company with ID ${updateCelebDto.companyId} not found`);
+      }
+    }
+
+    Object.assign(celeb, { 
+      companyId: updateCelebDto.companyId !== undefined ? updateCelebDto.companyId : celeb.companyId,
+      celeb_type: updateCelebDto.celebType !== undefined ? updateCelebDto.celebType : celeb.celeb_type,
+    });
+
+    return this.celebRepository.save(celeb);
   }
 }

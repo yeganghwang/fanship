@@ -482,6 +482,31 @@
 
 ---
 
+### 사용자가 등록한 굿즈 목록 조회
+- **GET** `/api/users/{user_id}/goods`
+- Header: Authorization
+- Response: 200 OK + 굿즈 배열 (사용자가 등록한 굿즈 목록)
+
+```json
+{
+  "list": [
+    {
+      "id": 1,
+      "seller_id": 2,
+      "title": "셀럽 포토북",
+      "content": "한정판 포토북입니다.",
+      "price": 19900.000,
+      "amount": 100,
+      "visible": true,
+      "sold": false,
+      "views": 0
+    }
+  ]
+}
+```
+
+---
+
 ## 로그인 기록
 
 ### 로그인 시 기록 저장

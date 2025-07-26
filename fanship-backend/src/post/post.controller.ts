@@ -1,6 +1,7 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Get, Query, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Get, Query, Param, Delete, Patch } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostEntity } from './post.entity';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -29,6 +30,16 @@ export class PostController {
   @Get(':postId')
   async findOneById(@Param('postId') postId: number): Promise<any> {
     return this.postService.findOneById(postId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':postId')
+  async updatePost(
+    @Param('postId') postId: number,
+    @Body() updatePostDto: UpdatePostDto,
+    @Request() req,
+  ): Promise<PostEntity> {
+    return this.postService.updatePost(postId, req.user.userId, updatePostDto);
   }
 
   @UseGuards(AuthGuard('jwt'))

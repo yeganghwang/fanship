@@ -1,20 +1,22 @@
-import { Injectable, ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { CelebService } from '../celeb/celeb.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private celebService: CelebService,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {
-    const { username, mail, nickname, password, ig_url, dob, pfp_img_url, company_id, celeb_type } = createUserDto; // 필드 추가
+    const { username, mail, nickname, password, ig_url, dob, pfp_img_url, position, company_id, celeb_type } = createUserDto; // 필드 추가
 
     // 중복 사용자 확인
     const existingUser = await this.usersRepository.findOne({
@@ -53,18 +55,26 @@ export class UserService {
     const parsedDob = dob ? new Date(dob) : null;
 
     const user = new User(); // User 엔티티 인스턴스 생성
-    user.username = createUserDto.username;
+    user.username = username;
     user.password = hashedPassword;
-    user.mail = createUserDto.mail;
-    user.nickname = createUserDto.nickname;
-    user.position = createUserDto.position;
+    user.mail = mail;
+    user.nickname = nickname;
+    user.position = position;
     user.dob = parsedDob;
-    user.ig_url = ig_url === undefined ? null : ig_url; // undefined를 null로 변환
-    user.pfp_img_url = pfp_img_url === undefined ? null : pfp_img_url; // undefined를 null로 변환
-    user.company_id = company_id === undefined ? null : company_id; // undefined를 null로 변환
-    user.celeb_type = celeb_type === undefined ? null : celeb_type; // undefined를 null로 변환
+    user.ig_url = ig_url === undefined ? null : ig_url;
+    user.pfp_img_url = pfp_img_url === undefined ? null : pfp_img_url;
 
-    return this.usersRepository.save(user); // newUser 대신 user 사용
+    const savedUser = await this.usersRepository.save(user);
+
+    // position이 celeb인 경우 tb_celeb에 추가
+    if (position === 'celeb') {
+      if (company_id === undefined || celeb_type === undefined) {
+        throw new BadRequestException('company_id and celeb_type are required for celeb position');
+      }
+      await this.celebService.createCeleb({ userId: savedUser.userId, companyId: company_id, celebType: celeb_type });
+    }
+
+    return savedUser;
   }
 
   async findOneByUsername(username: string): Promise<User | null> {
@@ -109,7 +119,19 @@ export class UserService {
     // 업데이트할 필드만 적용
     Object.assign(user, updateUserDto);
 
-    return this.usersRepository.save(user);
+    const updatedUser = await this.usersRepository.save(user);
+
+    // position이 celeb인 경우 tb_celeb 업데이트
+    if (updatedUser.position === 'celeb') {
+      if (updateUserDto.company_id !== undefined || updateUserDto.celeb_type !== undefined) {
+        await this.celebService.updateCeleb(updatedUser.userId, {
+          companyId: updateUserDto.company_id,
+          celebType: updateUserDto.celeb_type,
+        });
+      }
+    }
+
+    return updatedUser;
   }
 
   async requestPasswordReset(mail: string): Promise<void> {
