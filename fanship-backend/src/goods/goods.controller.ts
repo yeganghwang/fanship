@@ -40,9 +40,8 @@ export class GoodsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':goodsId')
-  @HttpCode(HttpStatus.OK)
-  async deleteGoods(@Param('goodsId') goodsId: number, @Request() req): Promise<{ message: string }> {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteGoods(@Param('goodsId') goodsId: number, @Request() req): Promise<void> {
     await this.goodsService.deleteGoods(goodsId, req.user.userId);
-    return { message: '굿즈가 성공적으로 삭제되었습니다.' };
   }
 }

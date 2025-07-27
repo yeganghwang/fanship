@@ -96,13 +96,13 @@ export class UserController {
     return { list: posts };
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  //@UseGuards(AuthGuard('jwt'))
   @Get(':userId/goods')
   async getUserGoods(@Param('userId') userId: number, @Request() req): Promise<{ list: any[] }> {
     const requestedUserId = Number(userId);
-    if (req.user.userId !== requestedUserId) {
-      throw new ForbiddenException('You are not authorized to view this user\'s goods.');
-    }
+    //     if (req.user.userId !== requestedUserId) {
+    //       throw new ForbiddenException('You are not authorized to view this user\'s goods.');
+    //     }
     const goods = await this.goodsService.findGoodsByUserId(requestedUserId);
     return { list: goods };
   }

@@ -1103,9 +1103,21 @@ This document outlines the expected input and output for each API endpoint, base
   - **403 Forbidden:** 굿즈 등록 권한이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 201 Created
   - **Body (JSON):**
     ```json
+    {
+    "goods_id": 11,
+    "seller_id": 47,
+    "title": "새로운 굿즈명",
+    "content": "<h1>새로운 굿즈 설명입니다.</h1>",
+    "price": 19900,
+    "amount": 100,
+    "created_at": "2025-07-27T10:53:29.000Z",
+    "visible": true,
+    "views": 0,
+    "sold": false
+    }
     ```
 
 ### 6.2. 굿즈 목록 조회 (GET /api/goods)
@@ -1140,9 +1152,34 @@ This document outlines the expected input and output for each API endpoint, base
 - **Error Cases:** None explicitly defined.
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "list": [
+        {
+            "goods_id": 10,
+            "title": "새로운 굿즈명",
+            "price": 19900,
+            "amount": 100,
+            "notice": true
+        },
+        {
+            "goods_id": 11,
+            "title": "새로운 굿즈명",
+            "price": 19900,
+            "amount": 100,
+            "notice": true
+        },
+        {
+            "goods_id": 12,
+            "title": "새로운 굿즈명3",
+            "price": 19900,
+            "amount": 100,
+            "notice": true
+        }
+      ]
+    }
     ```
 
 ### 6.3. 굿즈 상세 조회 (GET /api/goods/{id})
@@ -1170,9 +1207,19 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `id`에 해당하는 굿즈가 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "company_name": "모에모에큥",
+    "celeb_type": "씹덕아이돌",
+    "seller_nickname": "브루미",
+    "title": "새로운 굿즈명",
+    "content": "<h1>새로운 굿즈 설명입니다.</h1>",
+    "price": 19900,
+    "amount": 100,
+    "notice": true
+    }
     ```
 
 ### 6.4. 굿즈 수정 (PATCH /api/goods/{id})
@@ -1218,9 +1265,20 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `id`에 해당하는 굿즈가 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "goods_id": 10,
+    "seller_id": 47,
+    "title": "수정된 굿즈명",
+    "content": "수정된 설명",
+    "price": 25000,
+    "amount": 50,
+    "created_at": "2025-07-27T10:51:59.000Z",
+    "views": 1,
+    "sold": true
+    }
     ```
 
 ### 6.5. 굿즈 삭제 (DELETE /api/goods/{id})
@@ -1238,18 +1296,15 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `id`에 해당하는 굿즈가 없는 경우
 
 - **Result:**
-  - **Status Code:** 
-  - **Body (JSON):**
-    ```json
-    ```
+  - **Status Code:** 204 No Content
 
-### 6.6. 사용자가 등록한 굿즈 목록 조회 (GET /api/users/{user_id}/goods)
+
+### 6.6. 특정 사용자가 등록한 굿즈 목록 조회 (GET /api/users/{user_id}/goods)
 - **Description:** 특정 사용자가 등록한 굿즈 목록을 조회합니다.
 - **Input:**
   - **Path Parameters:**
     - `user_id`: 1 (조회할 사용자의 ID)
-  - **Headers:**
-    - `Authorization`: `Bearer <JWT_TOKEN>`
+  - 인증 불필요
 - **Expected Output:**
   - **Status Code:** 200 OK
   - **Body (JSON):**
@@ -1277,9 +1332,35 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `user_id`에 해당하는 사용자가 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "list": [
+        {
+            "goods_id": 12,
+            "seller_id": 47,
+            "title": "새로운 굿즈명3",
+            "content": "<h1>새로운 굿즈 설명입니다.</h1>",
+            "price": 19900,
+            "amount": 100,
+            "visible": true,
+            "sold": false,
+            "views": 0
+        },
+        {
+            "goods_id": 10,
+            "seller_id": 47,
+            "title": "수정된 굿즈명",
+            "content": "수정된 설명",
+            "price": 25000,
+            "amount": 50,
+            "visible": true,
+            "sold": true,
+            "views": 1
+        }
+      ]
+    } 
     ```
 
 ## 7. 로그인 기록

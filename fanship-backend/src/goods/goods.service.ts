@@ -29,8 +29,7 @@ export class GoodsService {
       content: savedGoods.content,
       price: savedGoods.price,
       amount: savedGoods.amount,
-      createdt: savedGoods.createdAt,
-      visible: savedGoods.visible,
+      created_at: savedGoods.createdAt,
       views: savedGoods.views,
       sold: savedGoods.sold,
     };
@@ -136,7 +135,6 @@ export class GoodsService {
       price: Number(updatedGoods.price),
       amount: updatedGoods.amount,
       created_at: updatedGoods.createdAt,
-      visible: updatedGoods.visible,
       views: updatedGoods.views,
       sold: updatedGoods.sold,
     };
