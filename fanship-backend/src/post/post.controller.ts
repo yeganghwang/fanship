@@ -12,7 +12,7 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createPost(@Body() createPostDto: CreatePostDto, @Request() req): Promise<PostEntity> {
+  async createPost(@Body() createPostDto: CreatePostDto, @Request() req): Promise<any> {
     createPostDto.writerId = createPostDto.writerId || req.user.userId;
     return this.postService.createPost(createPostDto);
   }

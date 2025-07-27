@@ -15,14 +15,26 @@ export class PostService {
     private userService: UserService,
   ) {}
 
-  async createPost(createPostDto: CreatePostDto): Promise<Post> {
+  async createPost(createPostDto: CreatePostDto): Promise<any> {
     const writer = await this.userService.findOneByUserId(createPostDto.writerId);
     if (!writer) {
       throw new NotFoundException(`Writer with ID ${createPostDto.writerId} not found`);
     }
 
     const newPost = this.postRepository.create(createPostDto);
-    return this.postRepository.save(newPost);
+    const savedPost = await this.postRepository.save(newPost);
+
+    // api.md 명세에 맞는 응답 형식으로 변환
+    return {
+      post_id: savedPost.id,
+      writer_id: savedPost.writerId,
+      nickname: writer.nickname,
+      title: savedPost.title,
+      content: savedPost.content,
+      created_at: savedPost.createdAt,
+      views: savedPost.views,
+      notice: savedPost.notice,
+    };
   }
 
   async findAll(notice?: boolean): Promise<any[]> {

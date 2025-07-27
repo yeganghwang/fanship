@@ -532,6 +532,19 @@ This document outlines the expected input and output for each API endpoint, base
   - **Status Code:** 
   - **Body (JSON):**
     ```json
+    {
+    "list": [
+        {
+            "post_id": 13,
+            "writer_id": 41,
+            "nickname": "새로운닉네임",
+            "title": "새로운 게시글 제목",
+            "created_at": "2025-07-27T07:47:56.000Z",
+            "views": 0,
+            "notice": false
+        }
+    ]
+    }
     ```
 
 ## 4. 게시판
@@ -569,9 +582,19 @@ This document outlines the expected input and output for each API endpoint, base
   - **401 Unauthorized:** 유효하지 않거나 토큰이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 201 Created
   - **Body (JSON):**
     ```json
+    {
+    "post_id": 16,
+    "writer_id": 41,
+    "nickname": "새로운닉네임",
+    "title": "새로운 게시글 제목!",
+    "content": "새로운 게시글 내용입니다~",
+    "created_at": "2025-07-27T07:56:50.000Z",
+    "views": 0,
+    "notice": false
+    }
     ```
 
 ### 4.2. 게시글 목록 조회 (GET /api/posts)
@@ -613,6 +636,28 @@ This document outlines the expected input and output for each API endpoint, base
   - **Status Code:** 
   - **Body (JSON):**
     ```json
+    {
+      "list": [
+        {
+          "post_id": 16,
+          "writer_id": 41,
+          "nickname": "새로운닉네임",
+          "title": "새로운 게시글 제목!",
+          "created_at": "2025-07-27T07:56:50.000Z",
+          "views": 0,
+          "notice": false
+        },
+        {
+          "post_id": 13,
+          "writer_id": 41,
+          "nickname": "새로운닉네임",
+          "title": "새로운 게시글 제목",
+          "created_at": "2025-07-27T07:47:56.000Z",
+          "views": 0,
+          "notice": false
+        }
+      ]
+    }
     ```
 
 ### 4.3. 게시글 상세 조회 (GET /api/posts/{post_id})
