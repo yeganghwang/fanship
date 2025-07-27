@@ -27,9 +27,8 @@ export class ScheduleController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('schedules/:scheduleId')
-  @HttpCode(HttpStatus.OK)
-  async deleteSchedule(@Param('scheduleId') scheduleId: number, @Request() req): Promise<{ message: string }> {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteSchedule(@Param('scheduleId') scheduleId: number, @Request() req): Promise<void> {
     await this.scheduleService.deleteSchedule(scheduleId, req.user.userId);
-    return { message: '스케줄이 성공적으로 삭제되었습니다.' };
   }
 } 

@@ -950,7 +950,7 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `comment_id`에 해당하는 댓글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 204 No Content
   - **Body (JSON):**
     ```json
     ```
@@ -991,9 +991,16 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `celeb_id`에 해당하는 셀럽이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 201 Created
   - **Body (JSON):**
     ```json
+    {
+    "schedule_id": 10,
+    "celeb_id": 11,
+    "schedule_type": "출근",
+    "start_dt": "2025-08-01T19:00:00.000Z",
+    "end_dt": "2025-08-01T21:00:00.000Z"
+    }
     ```
 
 ### 5.2. 셀럽 스케줄 조회 (GET /api/celebs/{celeb_id}/schedules)
@@ -1022,9 +1029,20 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `celeb_id`에 해당하는 셀럽이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "list": [
+        {
+            "schedule_id": 10,
+            "celeb_id": 11,
+            "schedule_type": "출근",
+            "start_dt": "2025-08-01T19:00:00.000Z",
+            "end_dt": "2025-08-01T21:00:00.000Z"
+        }
+      ]
+    }
     ```
 
 ### 5.3. 셀럽 스케줄 삭제 (DELETE /api/celebs/schedules/{schedule_id})
@@ -1042,10 +1060,7 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `schedule_id`에 해당하는 스케줄이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
-  - **Body (JSON):**
-    ```json
-    ```
+  - **Status Code:** 204 No Content
 
 ## 6. 굿즈
 
