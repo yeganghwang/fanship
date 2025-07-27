@@ -633,7 +633,7 @@ This document outlines the expected input and output for each API endpoint, base
 - **Error Cases:** None explicitly defined.
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
     {
@@ -685,9 +685,19 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `post_id`에 해당하는 게시글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "post_id": 16,
+    "writer_id": 41,
+    "nickname": "새로운닉네임",
+    "title": "새로운 게시글 제목!",
+    "content": "새로운 게시글 내용입니다~",
+    "created_at": "2025-07-27T07:56:50.000Z",
+    "views": 1,
+    "notice": false
+    }
     ```
 
 ### 4.4. 게시글 수정 (PATCH /api/posts/{post_id})
@@ -710,16 +720,18 @@ This document outlines the expected input and output for each API endpoint, base
   - **Body (JSON):**
     ```json
     {
-      "post_id": 12,
-      "writer_id": 22,
-      "title": "수정된 제목",
-      "content": "수정된 내용",
-      "created_at": "2025-07-26T18:06:04.000Z",
-      "notice": true,
-      "visible": true,
-      "views": 5
+    "post_id": 16,
+    "writer_id": 41,
+    "nickname": "새로운닉네임",
+    "title": "수정 전 게시글",
+    "content": "새로운 게시글 내용입니다~",
+    "created_at": "2025-07-27T07:56:50.000Z",
+    "views": 2,
+    "notice": false
     }
     ```
+
+
 - **Error Cases:**
   - **400 Bad Request:** 잘못된 형식
   - **401 Unauthorized:** 유효하지 않거나 토큰이 없는 경우
@@ -727,9 +739,19 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `post_id`에 해당하는 게시글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "post_id": 16,
+    "writer_id": 41,
+    "nickname": "새로운닉네임",
+    "title": "수정된 제목",
+    "content": "수정된 내용",
+    "created_at": "2025-07-27T07:56:50.000Z",
+    "views": 2,
+    "notice": true
+  }
     ```
 
 ### 4.5. 게시글 삭제 (DELETE /api/posts/{post_id})
@@ -747,10 +769,14 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `post_id`에 해당하는 게시글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "message": "게시글이 성공적으로 삭제되었습니다."
+    }
     ```
+  - 204 No Content가 나와야 하고, 메시지가 출력되지 말아야 한다.
 
 ### 4.6. 댓글 작성 (POST /api/posts/{post_id}/comments)
 - **Description:** 특정 게시글에 댓글을 작성합니다.
