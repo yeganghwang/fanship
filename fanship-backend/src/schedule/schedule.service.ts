@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Schedule } from './schedule.entity';
 import { CelebService } from '../celeb/celeb.service';
 import { CreateScheduleDto, UpdateScheduleDto } from './dto/create-schedule.dto';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class ScheduleService {
@@ -13,24 +14,40 @@ export class ScheduleService {
     private celebService: CelebService,
   ) {}
 
-  async findSchedulesByCelebId(celebId: number): Promise<any[]> {
+  async findSchedulesByCelebId(celebId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const celeb = await this.celebService.findOneById(celebId);
     if (!celeb) {
       throw new NotFoundException(`Celeb with ID ${celebId} not found`);
     }
 
-    const schedules = await this.scheduleRepository.find({
-      where: { celebId },
-      order: { start_dt: 'ASC' },
-    });
+    const query = this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .where('schedule.celebId = :celebId', { celebId })
+      .orderBy('schedule.start_dt', 'ASC');
 
-    return schedules.map(schedule => ({
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
+    const schedules = await query.getMany();
+
+    const list = schedules.map(schedule => ({
       schedule_id: schedule.id,
       celeb_id: schedule.celebId,
       schedule_type: schedule.schedule_type,
       start_dt: schedule.start_dt,
       end_dt: schedule.end_dt,
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async createSchedule(celebId: number, createScheduleDto: CreateScheduleDto, userId: number): Promise<any> {

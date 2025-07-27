@@ -4,6 +4,7 @@ import { Company } from './company.entity';
 import { CelebService } from '../celeb/celeb.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller('companies')
 export class CompanyController {
@@ -21,14 +22,20 @@ export class CompanyController {
   }
 
   @Get()
-  async findAll(@Query('region') region?: string): Promise<{ list: Company[] }> {
-    const companies = await this.companyService.findAll(region);
-    return { list: companies };
+  async findAll(
+    @Query('region') region?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
+    return this.companyService.findAll(region, page, limit);
   }
 
   @Get(':companyId/celebs')
-  async findCelebsByCompanyId(@Param('companyId') companyId: number): Promise<{ list: any[] }> {
-    const celebs = await this.celebService.findCelebsByCompanyId(companyId);
-    return { list: celebs };
+  async findCelebsByCompanyId(
+    @Param('companyId') companyId: number,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
+    return this.celebService.findCelebsByCompanyId(companyId, page, limit);
   }
 }

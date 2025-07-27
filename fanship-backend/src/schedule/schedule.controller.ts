@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Get, Param, Delete, ForbiddenException } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Get, Param, Delete, ForbiddenException, Query } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { Schedule } from './schedule.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller('celebs')
 export class ScheduleController {
@@ -20,9 +21,12 @@ export class ScheduleController {
   }
 
   @Get(':celebId/schedules')
-  async findSchedulesByCelebId(@Param('celebId') celebId: number): Promise<{ list: any[] }> {
-    const schedules = await this.scheduleService.findSchedulesByCelebId(celebId);
-    return { list: schedules };
+  async findSchedulesByCelebId(
+    @Param('celebId') celebId: number,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
+    return this.scheduleService.findSchedulesByCelebId(celebId, page, limit);
   }
 
   @UseGuards(AuthGuard('jwt'))

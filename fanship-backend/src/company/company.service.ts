@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UserService } from '../user/user.service';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class CompanyService {
@@ -51,22 +52,36 @@ export class CompanyService {
     };
   }
 
-  async findAll(region?: string): Promise<any[]> {
+  async findAll(region?: string, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const query = this.companyRepository.createQueryBuilder('company');
 
     if (region) {
       query.where('company.region = :region', { region });
     }
 
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
     const companies = await query.getMany();
     
-    return companies.map(company => ({
-      id: company.id,
+    const list = companies.map(company => ({
+      company_id: company.id,
       company_name: company.company_name,
       ceo_id: company.ceoId,
       company_type: company.company_type,
       region: company.region,
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async findOneById(companyId: number): Promise<Company | null> {

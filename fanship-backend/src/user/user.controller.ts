@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, UseGuards, Request, NotFoundException, ForbiddenException, Patch, Delete  } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, UseGuards, Request, NotFoundException, ForbiddenException, Patch, Delete, Query  } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,6 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FavoriteService } from '../favorite/favorite.service';
 import { PostService } from '../post/post.service';
 import { GoodsService } from '../goods/goods.service';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller('users') // 기본 경로 설정
 export class UserController {
@@ -76,34 +77,46 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':userId/favorites')
-  async getUserFavorites(@Param('userId') userId: number, @Request() req): Promise<{ list: any[] }> {
+  async getUserFavorites(
+    @Param('userId') userId: number, 
+    @Request() req,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
     const requestedUserId = Number(userId);
     if (req.user.userId !== requestedUserId) {
       throw new ForbiddenException('You are not authorized to view this user\'s favorites.');
     }
-    const favorites = await this.favoriteService.findFavoritesByUserId(requestedUserId);
-    return { list: favorites };
+    return this.favoriteService.findFavoritesByUserId(requestedUserId, page, limit);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':userId/posts')
-  async getUserPosts(@Param('userId') userId: number, @Request() req): Promise<{ list: any[] }> {
+  async getUserPosts(
+    @Param('userId') userId: number, 
+    @Request() req,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
     const requestedUserId = Number(userId);
     if (req.user.userId !== requestedUserId) {
       throw new ForbiddenException('You are not authorized to view this user\'s posts.');
     }
-    const posts = await this.postService.findPostsByUserId(requestedUserId);
-    return { list: posts };
+    return this.postService.findPostsByUserId(requestedUserId, page, limit);
   }
 
   //@UseGuards(AuthGuard('jwt'))
   @Get(':userId/goods')
-  async getUserGoods(@Param('userId') userId: number, @Request() req): Promise<{ list: any[] }> {
+  async getUserGoods(
+    @Param('userId') userId: number, 
+    @Request() req,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
     const requestedUserId = Number(userId);
     //     if (req.user.userId !== requestedUserId) {
     //       throw new ForbiddenException('You are not authorized to view this user\'s goods.');
     //     }
-    const goods = await this.goodsService.findGoodsByUserId(requestedUserId);
-    return { list: goods };
+    return this.goodsService.findGoodsByUserId(requestedUserId, page, limit);
   }
 }

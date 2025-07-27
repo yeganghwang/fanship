@@ -104,4 +104,12 @@ export class AuthService {
       user_id: user.userId,
     };
   }
+
+  async logout(token: string): Promise<{ message: string }> {
+    // 현재는 토큰 블랙리스트를 지원하지 않으므로 성공 응답만 반환
+    // 향후 토큰 블랙리스트 기능 구현 시 여기에 로직 추가
+    return {
+      message: 'Successfully logged out'
+    };
+  }
 }

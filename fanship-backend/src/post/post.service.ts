@@ -6,6 +6,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../user/user.entity';
 import { UserService } from '../user/user.service';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class PostService {
@@ -37,7 +38,7 @@ export class PostService {
     };
   }
 
-  async findAll(notice?: boolean): Promise<any[]> {
+  async findAll(notice?: boolean, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const query = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.writer', 'user')
@@ -49,9 +50,16 @@ export class PostService {
 
     query.orderBy('post.createdAt', 'DESC');
 
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
     const posts = await query.getMany();
 
-    return posts.map(post => ({
+    const list = posts.map(post => ({
       post_id: post.id,
       writer_id: post.writerId,
       nickname: post.writer.nickname,
@@ -60,6 +68,48 @@ export class PostService {
       views: post.views,
       notice: post.notice,
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
+  }
+
+  async findPostsByUserId(userId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
+    const query = this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.writer', 'user')
+      .where('post.writerId = :userId', { userId })
+      .andWhere('post.visible = :visible', { visible: true })
+      .orderBy('post.createdAt', 'DESC');
+
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
+    const posts = await query.getMany();
+
+    const list = posts.map(post => ({
+      post_id: post.id,
+      writer_id: post.writerId,
+      nickname: post.writer.nickname,
+      title: post.title,
+      created_at: post.createdAt.toISOString().split('T')[0], // YYYY-MM-DD 형식
+      views: post.views,
+      notice: post.notice,
+    }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async findOneById(postId: number): Promise<any> {
@@ -112,35 +162,6 @@ export class PostService {
 
     post.visible = false;
     await this.postRepository.save(post);
-  }
-
-  async findPostsByUserId(userId: number): Promise<any[]> {
-    const posts = await this.postRepository
-      .createQueryBuilder('post')
-      .leftJoinAndSelect('post.writer', 'user')
-      .where('post.writerId = :userId', { userId })
-      .andWhere('post.visible = :visible', { visible: true })
-      .select([
-        'post.id',
-        'post.writerId',
-        'user.nickname',
-        'post.title',
-        'post.createdAt',
-        'post.views',
-        'post.notice',
-      ])
-      .orderBy('post.createdAt', 'DESC')
-      .getMany();
-
-    return posts.map(post => ({
-      post_id: post.id,
-      writer_id: post.writerId,
-      nickname: post.writer.nickname,
-      title: post.title,
-      created_at: post.createdAt,
-      views: post.views,
-      notice: post.notice,
-    }));
   }
 
   async updatePost(postId: number, userId: number, updatePostDto: UpdatePostDto): Promise<any> {

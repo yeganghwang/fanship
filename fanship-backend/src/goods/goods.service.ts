@@ -7,6 +7,7 @@ import { UpdateGoodsDto } from './dto/update-goods.dto';
 import { User } from '../user/user.entity';
 import { Company } from '../company/company.entity';
 import { Celeb } from '../celeb/celeb.entity';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class GoodsService {
@@ -35,7 +36,7 @@ export class GoodsService {
     };
   }
 
-  async findAll(sellerId?: number): Promise<any[]> {
+  async findAll(sellerId?: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const query = this.goodsRepository
       .createQueryBuilder('goods')
       .leftJoinAndSelect('goods.seller', 'user')
@@ -45,15 +46,66 @@ export class GoodsService {
       query.andWhere('goods.sellerId = :sellerId', { sellerId });
     }
 
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
     const goods = await query.getMany();
 
-    return goods.map(item => ({
+    const list = goods.map(item => ({
       goods_id: item.id,
       title: item.title,
       price: Number(item.price),
       amount: item.amount,
       notice: item.visible,
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
+  }
+
+  async findGoodsByUserId(userId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
+    const query = this.goodsRepository
+      .createQueryBuilder('goods')
+      .leftJoinAndSelect('goods.seller', 'user')
+      .where('goods.sellerId = :userId', { userId })
+      .andWhere('goods.visible = :visible', { visible: true });
+
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
+    const goods = await query.getMany();
+
+    const list = goods.map(item => ({
+      goods_id: item.id,
+      seller_id: item.sellerId,
+      title: item.title,
+      content: item.content,
+      price: Number(item.price),
+      amount: item.amount,
+      visible: item.visible,
+      sold: item.sold,
+      views: item.views,
+      notice: item.visible,
+    }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async findOneById(goodsId: number): Promise<any> {
@@ -138,40 +190,5 @@ export class GoodsService {
       views: updatedGoods.views,
       sold: updatedGoods.sold,
     };
-  }
-
-  async findGoodsByUserId(userId: number): Promise<any[]> {
-    const goods = await this.goodsRepository
-      .createQueryBuilder('goods')
-      .leftJoinAndSelect('goods.seller', 'user')
-      .where('goods.sellerId = :userId', { userId })
-      .andWhere('goods.visible = :visible', { visible: true })
-      .select([
-        'goods.id',
-        'goods.sellerId',
-        'goods.title',
-        'goods.content',
-        'goods.price',
-        'goods.amount',
-        'goods.visible',
-        'goods.sold',
-        'goods.views',
-      ])
-      .orderBy('goods.createdAt', 'DESC')
-      .getMany();
-
-    console.log('Fetched goods:', goods);
-
-    return goods.map(item => ({
-      goods_id: item.id,
-      seller_id: item.sellerId,
-      title: item.title,
-      content: item.content,
-      price: Number(item.price),
-      amount: item.amount,
-      visible: item.visible,
-      sold: item.sold,
-      views: item.views,
-    }));
   }
 }

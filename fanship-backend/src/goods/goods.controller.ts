@@ -4,6 +4,7 @@ import { CreateGoodsDto } from './dto/create-goods.dto';
 import { UpdateGoodsDto } from './dto/update-goods.dto';
 import { Goods } from './goods.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller('goods')
 export class GoodsController {
@@ -18,9 +19,12 @@ export class GoodsController {
   }
 
   @Get()
-  async findAll(@Query('seller_id') sellerId?: number): Promise<{ list: any[] }> {
-    const goods = await this.goodsService.findAll(sellerId);
-    return { list: goods };
+  async findAll(
+    @Query('seller_id') sellerId?: number,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
+    return this.goodsService.findAll(sellerId, page, limit);
   }
 
   @Get(':goodsId')

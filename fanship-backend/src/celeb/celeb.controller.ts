@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CelebService } from './celeb.service';
 import { ScheduleService } from '../schedule/schedule.service';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller('celebs')
 export class CelebController {
@@ -15,8 +16,11 @@ export class CelebController {
   }
 
   @Get(':celebId/schedules')
-  async findSchedulesByCelebId(@Param('celebId') celebId: number): Promise<{ list: any[] }> {
-    const schedules = await this.scheduleService.findSchedulesByCelebId(celebId);
-    return { list: schedules };
+  async findSchedulesByCelebId(
+    @Param('celebId') celebId: number,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
+    return this.scheduleService.findSchedulesByCelebId(celebId, page, limit);
   }
 }

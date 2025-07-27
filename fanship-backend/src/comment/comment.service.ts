@@ -5,6 +5,7 @@ import { Comment } from './comment.entity';
 import { CreateCommentDto, UpdateCommentDto } from './dto/create-comment.dto';
 import { PostService } from '../post/post.service';
 import { UserService } from '../user/user.service';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class CommentService {
@@ -42,19 +43,29 @@ export class CommentService {
     };
   }
 
-  async findCommentsByPostId(postId: number): Promise<any[]> {
+  async findCommentsByPostId(postId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const post = await this.postService.findOneById(postId);
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
     
-    const comments = await this.commentRepository.find({
-      where: { postId, visible: true },
-      relations: ['writer'],
-      order: { createdAt: 'ASC' },
-    });
+    const query = this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.writer', 'user')
+      .where('comment.postId = :postId', { postId })
+      .andWhere('comment.visible = :visible', { visible: true })
+      .orderBy('comment.createdAt', 'ASC');
 
-    return comments.map(comment => ({
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
+    const comments = await query.getMany();
+
+    const list = comments.map(comment => ({
       comment_id: comment.id,
       post_id: comment.postId,
       writer_id: comment.writerId,
@@ -62,6 +73,13 @@ export class CommentService {
       content: comment.content,
       created_at: comment.createdAt.toISOString().split('T')[0], // YYYY-MM-DD 형식
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<any> {

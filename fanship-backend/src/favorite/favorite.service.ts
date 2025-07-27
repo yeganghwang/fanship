@@ -6,6 +6,7 @@ import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UserService } from '../user/user.service';
 import { CompanyService } from '../company/company.service';
 import { CelebService } from '../celeb/celeb.service';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class FavoriteService {
@@ -71,16 +72,24 @@ export class FavoriteService {
     };
   }
 
-  async findFavoritesByUserId(userId: number): Promise<any[]> {
-    const favorites = await this.favoriteRepository
+  async findFavoritesByUserId(userId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
+    const query = this.favoriteRepository
       .createQueryBuilder('favorite')
       .leftJoinAndSelect('favorite.company', 'company')
       .leftJoinAndSelect('favorite.celeb', 'celeb')
       .leftJoinAndSelect('celeb.user', 'celebUser')
-      .where('favorite.userId = :userId', { userId })
-      .getMany();
+      .where('favorite.userId = :userId', { userId });
 
-    return favorites.map(fav => ({
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
+    const favorites = await query.getMany();
+
+    const list = favorites.map(fav => ({
       favorite_id: fav.id,
       user_id: fav.userId,
       company_id: fav.companyId,
@@ -88,6 +97,13 @@ export class FavoriteService {
       company_name: fav.company?.company_name || null,
       celeb_nickname: fav.celeb?.user?.nickname || null,
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async deleteFavorite(favoriteId: number, userId: number): Promise<void> {

@@ -4,6 +4,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostEntity } from './post.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller('posts')
 export class PostController {
@@ -18,13 +19,16 @@ export class PostController {
   }
 
   @Get()
-  async findAll(@Query('notice') notice?: string): Promise<{ list: any[] }> {
+  async findAll(
+    @Query('notice') notice?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
     let noticeFilter: boolean | undefined;
     if (notice !== undefined) {
       noticeFilter = notice === 'true';
     }
-    const posts = await this.postService.findAll(noticeFilter);
-    return { list: posts };
+    return this.postService.findAll(noticeFilter, page, limit);
   }
 
   @Get(':postId')

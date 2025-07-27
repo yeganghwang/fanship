@@ -6,6 +6,7 @@ import { User } from '../user/user.entity';
 import { Company } from '../company/company.entity';
 import { CompanyService } from '../company/company.service';
 import { CreateCelebDto, UpdateCelebDto } from './dto/create-celeb.dto';
+import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
 
 @Injectable()
 export class CelebService {
@@ -35,13 +36,13 @@ export class CelebService {
     return this.celebRepository.save(newCeleb);
   }
 
-  async findCelebsByCompanyId(companyId: number): Promise<any[]> {
+  async findCelebsByCompanyId(companyId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const company = await this.companyService.findOneById(companyId);
     if (!company) {
       throw new NotFoundException(`Company with ID ${companyId} not found`);
     }
 
-    const celebs = await this.celebRepository
+    const query = this.celebRepository
       .createQueryBuilder('celeb')
       .leftJoinAndSelect('celeb.user', 'user')
       .where('celeb.companyId = :companyId', { companyId })
@@ -49,14 +50,29 @@ export class CelebService {
         'celeb.celebId',
         'user.nickname',
         'celeb.celeb_type',
-      ])
-      .getMany();
+      ]);
 
-    return celebs.map(celeb => ({
+    // 총 개수 조회
+    const totalItems = await query.getCount();
+
+    // 페이지네이션 적용
+    const { skip, take } = PaginationHelper.getSkipAndTake(page, limit);
+    query.skip(skip).take(take);
+
+    const celebs = await query.getMany();
+
+    const list = celebs.map(celeb => ({
       celeb_id: celeb.celebId,
       nickname: celeb.user.nickname,
       celeb_type: celeb.celeb_type,
     }));
+
+    const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
+
+    return {
+      list,
+      pagination,
+    };
   }
 
   async findOneById(celebId: number): Promise<any> {

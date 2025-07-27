@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request, Get, Param, Patch, Delete, Query } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto, UpdateCommentDto } from './dto/create-comment.dto';
 import { Comment } from './comment.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginatedResult } from '../common/interfaces/pagination.interface';
 
 @Controller()
 export class CommentController {
@@ -20,9 +21,12 @@ export class CommentController {
   }
 
   @Get('posts/:postId/comments')
-  async getCommentsByPostId(@Param('postId') postId: number): Promise<{ list: Comment[] }> {
-    const comments = await this.commentService.findCommentsByPostId(postId);
-    return { list: comments };
+  async getCommentsByPostId(
+    @Param('postId') postId: number,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<PaginatedResult<any>> {
+    return this.commentService.findCommentsByPostId(postId, page, limit);
   }
 
   @UseGuards(AuthGuard('jwt'))
