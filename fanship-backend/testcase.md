@@ -803,9 +803,17 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `post_id`에 해당하는 게시글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 201 Created
   - **Body (JSON):**
     ```json
+    {
+    "comment_id": 10,
+    "post_id": 13,
+    "writer_id": 47,
+    "nickname": "테스트celeb1",
+    "content": "새로운 댓글 내?ㅁㄴㅇㄹㅁㄴㅇㄹ용?",
+    "created_at": "2025-07-27T08:22:27.000Z"
+    }
     ```
 
 ### 4.7. 댓글 목록 조회 (GET /api/posts/{post_id}/comments)
@@ -835,9 +843,45 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `post_id`에 해당하는 게시글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "list": [
+        {
+            "comment_id": 7,
+            "post_id": 13,
+            "writer_id": 47,
+            "nickname": "테스트celeb1",
+            "content": "새로운 댓글 내용",
+            "created_at": "2025-07-27"
+        },
+        {
+            "comment_id": 8,
+            "post_id": 13,
+            "writer_id": 47,
+            "nickname": "테스트celeb1",
+            "content": "새로운 댓글 내용!",
+            "created_at": "2025-07-27"
+        },
+        {
+            "comment_id": 9,
+            "post_id": 13,
+            "writer_id": 47,
+            "nickname": "테스트celeb1",
+            "content": "새로운 댓글 내?용?",
+            "created_at": "2025-07-27"
+        },
+        {
+            "comment_id": 10,
+            "post_id": 13,
+            "writer_id": 47,
+            "nickname": "테스트celeb1",
+            "content": "새로운 댓글 내?ㅁㄴㅇㄹㅁㄴㅇㄹ용?",
+            "created_at": "2025-07-27"
+        }
+      ]
+    }
     ```
 
 ### 4.8. 댓글 수정 (PATCH /api/comments/{comment_id})
@@ -873,12 +917,25 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `comment_id`에 해당하는 댓글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 
+  - **Status Code:** 200 OK
   - **Body (JSON):**
     ```json
+    {
+    "id": 10,
+    "postId": 13,
+    "writerId": 47,
+    "content": "수정된 댓글 내용입니당. 히히",
+    "createdAt": "2025-07-27T08:22:27.000Z",
+    "visible": true
+    }
     ```
 
+
+
 ### 4.9. 댓글 삭제 (DELETE /api/comments/{comment_id})
+
+- 여기까지 완료했음.
+
 - **Description:** 특정 댓글을 삭제합니다.
 - **Input:**
   - **Path Parameters:**

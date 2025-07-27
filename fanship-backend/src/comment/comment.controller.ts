@@ -15,7 +15,7 @@ export class CommentController {
     @Param('postId') postId: number,
     @Body() createCommentDto: CreateCommentDto,
     @Request() req,
-  ): Promise<Comment> {
+  ): Promise<any> {
     return this.commentService.createComment(Number(postId), Number(req.user.userId), createCommentDto);
   }
 
@@ -31,15 +31,14 @@ export class CommentController {
     @Param('commentId') commentId: number,
     @Body() updateCommentDto: UpdateCommentDto,
     @Request() req,
-  ): Promise<Comment> {
+  ): Promise<any> {
     return this.commentService.updateComment(commentId, req.user.userId, updateCommentDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('comments/:commentId')
-  @HttpCode(HttpStatus.OK)
-  async deleteComment(@Param('commentId') commentId: number, @Request() req): Promise<{ message: string }> {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteComment(@Param('commentId') commentId: number, @Request() req): Promise<void> {
     await this.commentService.deleteComment(commentId, req.user.userId);
-    return { message: '댓글이 성공적으로 삭제되었습니다.' };
   }
 }

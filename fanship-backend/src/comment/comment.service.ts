@@ -15,7 +15,7 @@ export class CommentService {
     private userService: UserService,
   ) {}
 
-  async createComment(postId: number, writerId: number, createCommentDto: CreateCommentDto): Promise<Comment> {
+  async createComment(postId: number, writerId: number, createCommentDto: CreateCommentDto): Promise<any> {
     const { content } = createCommentDto;
 
     const post = await this.postService.findOneById(postId);
@@ -29,7 +29,17 @@ export class CommentService {
     }
 
     const newComment = this.commentRepository.create({ postId, writerId, content });
-    return this.commentRepository.save(newComment);
+    const savedComment = await this.commentRepository.save(newComment);
+
+    // api.md 명세에 맞는 응답 형식으로 변환
+    return {
+      comment_id: savedComment.id,
+      post_id: savedComment.postId,
+      writer_id: savedComment.writerId,
+      nickname: writer.nickname,
+      content: savedComment.content,
+      created_at: savedComment.createdAt,
+    };
   }
 
   async findCommentsByPostId(postId: number): Promise<any[]> {
@@ -54,8 +64,11 @@ export class CommentService {
     }));
   }
 
-  async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
-    const comment = await this.commentRepository.findOne({ where: { id: commentId, visible: true } });
+  async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<any> {
+    const comment = await this.commentRepository.findOne({ 
+      where: { id: commentId, visible: true },
+      relations: ['writer']
+    });
 
     if (!comment) {
       throw new NotFoundException(`Comment with ID ${commentId} not found`);
@@ -66,7 +79,17 @@ export class CommentService {
     }
 
     comment.content = updateCommentDto.content;
-    return this.commentRepository.save(comment);
+    const updatedComment = await this.commentRepository.save(comment);
+
+    // api.md 명세에 맞는 응답 형식으로 변환
+    return {
+      comment_id: updatedComment.id,
+      post_id: updatedComment.postId,
+      writer_id: updatedComment.writerId,
+      nickname: updatedComment.writer.nickname,
+      content: updatedComment.content,
+      created_at: updatedComment.createdAt,
+    };
   }
 
   async deleteComment(commentId: number, userId: number): Promise<void> {
