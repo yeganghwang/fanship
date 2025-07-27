@@ -434,7 +434,6 @@ This document outlines the expected input and output for each API endpoint, base
     "message": "즐겨찾기가 성공적으로 삭제되었습니다."
     }
     ```
-  - 200 OK가 아닌 204 No Content가 나와야 하고, json 응답이 없도록 백엔드를 수정해야 함.
 
 ### 3.3. 사용자의 즐겨찾기 목록 조회 (GET /api/users/{user_id}/favorites)
 - **Description:** 특정 사용자의 즐겨찾기 목록을 조회합니다.
