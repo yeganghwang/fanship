@@ -769,14 +769,7 @@ This document outlines the expected input and output for each API endpoint, base
   - **404 Not Found:** `post_id`에 해당하는 게시글이 없는 경우
 
 - **Result:**
-  - **Status Code:** 200 OK
-  - **Body (JSON):**
-    ```json
-    {
-    "message": "게시글이 성공적으로 삭제되었습니다."
-    }
-    ```
-  - 204 No Content가 나와야 하고, 메시지가 출력되지 말아야 한다.
+  - **Status Code:** 204 No Content
 
 ### 4.6. 댓글 작성 (POST /api/posts/{post_id}/comments)
 - **Description:** 특정 게시글에 댓글을 작성합니다.

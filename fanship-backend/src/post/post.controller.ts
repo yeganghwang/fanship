@@ -44,9 +44,8 @@ export class PostController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':postId')
-  @HttpCode(HttpStatus.OK)
-  async deletePost(@Param('postId') postId: number, @Request() req): Promise<{ message: string }> {
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(@Param('postId') postId: number, @Request() req): Promise<void> {
     await this.postService.deletePost(postId, req.user.userId);
-    return { message: '게시글이 성공적으로 삭제되었습니다.' };
   }
 }
