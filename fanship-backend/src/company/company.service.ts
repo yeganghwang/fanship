@@ -1,25 +1,37 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, ForbiddenException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from './company.entity';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class CompanyService {
   constructor(
     @InjectRepository(Company)
     private companyRepository: Repository<Company>,
+    @Inject(forwardRef(() => UserService))
+    private userService: UserService,
   ) {}
 
-  async createCompany(ceoId: number, createCompanyDto: CreateCompanyDto): Promise<Company> {
+  async createCompany(ceoId: number, createCompanyDto: CreateCompanyDto): Promise<any> {
     const { company_name, company_type, region } = createCompanyDto;
+
+    // CEO 권한 확인
+    const user = await this.userService.findOneByUserId(ceoId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    
+    if (user.position !== 'ceo') {
+      throw new ForbiddenException('Only users with CEO position can create companies');
+    }
 
     const existingCompany = await this.companyRepository.findOne({ where: { company_name } });
     if (existingCompany) {
       throw new ConflictException('Company name already exists');
     }
 
-    // CEO 사용자 존재 여부는 UserService에서 확인하도록 하고, 여기서는 단순히 저장
     const newCompany = this.companyRepository.create({
       company_name,
       ceoId,
@@ -27,7 +39,16 @@ export class CompanyService {
       region,
     });
 
-    return this.companyRepository.save(newCompany);
+    const savedCompany = await this.companyRepository.save(newCompany);
+
+    // api.md 명세에 맞는 응답 형식으로 변환
+    return {
+      company_id: savedCompany.id,
+      company_name: savedCompany.company_name,
+      ceo_id: savedCompany.ceoId,
+      company_type: savedCompany.company_type,
+      region: savedCompany.region,
+    };
   }
 
   async findAll(region?: string): Promise<any[]> {

@@ -11,7 +11,7 @@ export class FavoriteController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async addFavorite(@Body() createFavoriteDto: CreateFavoriteDto, @Request() req): Promise<Favorite> {
+  async addFavorite(@Body() createFavoriteDto: CreateFavoriteDto, @Request() req): Promise<any> {
     return this.favoriteService.addFavorite(createFavoriteDto, req.user.userId);
   }
 

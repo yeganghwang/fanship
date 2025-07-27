@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Unique, OneTo
 import { Celeb } from '../celeb/celeb.entity';
 import { Comment } from '../comment/comment.entity';
 import { Goods } from '../goods/goods.entity';
+import { Expose, Transform, Exclude } from 'class-transformer';
+import { format } from 'date-fns';
 
 @Entity('tb_user')
 @Unique(['username'])
@@ -9,6 +11,7 @@ import { Goods } from '../goods/goods.entity';
 @Unique(['nickname'])
 @Unique(['ig_url'])
 export class User {
+  @Expose({ name: 'user_id' })
   @PrimaryGeneratedColumn({ name: 'user_id' })
   userId: number;
 
@@ -24,12 +27,15 @@ export class User {
   @Column({ length: 12, nullable: false })
   nickname: string;
 
+  @Transform(({ value }) => value ? format(value, 'yyyy-MM-dd') : null)
   @Column({ type: 'date', nullable: true })
   dob: Date | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   pfp_img_url: string | null;
 
+  @Expose({ name: 'join_dt' })
+  @Transform(({ value }) => value ? value.toISOString() : null) // Keep ISO string for join_dt as per api.md
   @CreateDateColumn({ name: 'join_date', type: 'timestamp' })
   joinDate: Date;
 

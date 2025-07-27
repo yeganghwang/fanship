@@ -15,67 +15,7 @@ export class UserService {
     private celebService: CelebService,
   ) {}
 
-  async register(createUserDto: CreateUserDto): Promise<User> {
-    const { username, mail, nickname, password, ig_url, dob, pfp_img_url, position, company_id, celeb_type } = createUserDto; // 필드 추가
-
-    // 중복 사용자 확인
-    const existingUser = await this.usersRepository.findOne({
-      where: [
-        { username },
-        { mail },
-        { nickname },
-        ...(ig_url !== null && ig_url !== undefined ? [{ ig_url }] : []),
-      ],
-    });
-
-    if (existingUser) {
-      if (existingUser.username === username) {
-        throw new ConflictException('Username already exists');
-      }
-      if (existingUser.mail === mail) {
-        throw new ConflictException('Email already exists');
-      }
-      if (existingUser.nickname === nickname) {
-        throw new ConflictException('Nickname already exists');
-      }
-      if (existingUser.ig_url && existingUser.ig_url === ig_url) {
-        throw new ConflictException('Instagram URL already exists');
-      }
-    }
-
-    // 비밀번호 해싱
-    let hashedPassword;
-    try {
-      hashedPassword = await bcrypt.hash(password, 10);
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to hash password');
-    }
-
-    // dob (string)을 Date 객체로 변환
-    const parsedDob = dob ? new Date(dob) : null;
-
-    const user = new User(); // User 엔티티 인스턴스 생성
-    user.username = username;
-    user.password = hashedPassword;
-    user.mail = mail;
-    user.nickname = nickname;
-    user.position = position;
-    user.dob = parsedDob;
-    user.ig_url = ig_url === undefined ? null : ig_url;
-    user.pfp_img_url = pfp_img_url === undefined ? null : pfp_img_url;
-
-    const savedUser = await this.usersRepository.save(user);
-
-    // position이 celeb인 경우 tb_celeb에 추가
-    if (position === 'celeb') {
-      if (company_id === undefined || celeb_type === undefined) {
-        throw new BadRequestException('company_id and celeb_type are required for celeb position');
-      }
-      await this.celebService.createCeleb({ userId: savedUser.userId, companyId: company_id, celebType: celeb_type });
-    }
-
-    return savedUser;
-  }
+  
 
   async findOneByUsername(username: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { username } });

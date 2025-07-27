@@ -17,7 +17,7 @@ export class FavoriteService {
     private celebService: CelebService,
   ) {}
 
-  async addFavorite(createFavoriteDto: CreateFavoriteDto, userId: number): Promise<Favorite> {
+  async addFavorite(createFavoriteDto: CreateFavoriteDto, userId: number): Promise<any> {
     const { company_id, celeb_id } = createFavoriteDto;
 
     if (!company_id && !celeb_id) {
@@ -63,7 +63,12 @@ export class FavoriteService {
       companyId: company_id,
       celebId: celeb_id,
     });
-    return this.favoriteRepository.save(newFavorite);
+    const savedFavorite = await this.favoriteRepository.save(newFavorite);
+
+    // api.md 명세에 맞는 응답 형식으로 변환
+    return {
+      favorite_id: savedFavorite.id,
+    };
   }
 
   async findFavoritesByUserId(userId: number): Promise<any[]> {

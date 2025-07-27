@@ -15,7 +15,7 @@ export class CompanyController {
   @Post()
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.CREATED)
-  async createCompany(@Body() createCompanyDto: CreateCompanyDto, @Request() req): Promise<Company> {
+  async createCompany(@Body() createCompanyDto: CreateCompanyDto, @Request() req): Promise<any> {
     const ceoId = req.user.userId;
     return this.companyService.createCompany(ceoId, createCompanyDto);
   }

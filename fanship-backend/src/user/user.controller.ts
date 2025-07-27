@@ -18,23 +18,11 @@ export class UserController {
     private readonly goodsService: GoodsService,
   ) {}
 
-  @Post('register')
-  @HttpCode(HttpStatus.CREATED) // 201 Created 응답
-  async register(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.register(createUserDto);
-  }
+  
 
-  @UseGuards(AuthGuard('jwt')) // JWT Guard 적용
-  @Get(':userId') // api.md 명세에 따라 {user_id} 경로 사용
-  async getUserProfile(@Param('userId') userId: number, @Request() req): Promise<any> {
+  @Get(':userId') // api.md 명세에 따라 {user_id} 경로 사용 (인증 불필요)
+  async getUserProfile(@Param('userId') userId: number): Promise<any> {
     const requestedUserId = Number(userId);
-
-    // 현재 로그인한 사용자가 자신의 프로필을 조회하는지 확인
-    // 더 복잡한 권한 부여 로직은 나중에 추가할 수 있습니다.
-    // 아래 주석된 코드는 현재 로그인한 사용자만 자신의 프로필을 조회할 수 있도록 하는 코드입니다.
-    // if (req.user.userId !== requestedUserId) {
-    //   throw new ForbiddenException('You are not authorized to view this profile.');
-    // }
 
     const user = await this.userService.findOneByUserId(requestedUserId);
     if (!user) {
