@@ -152,6 +152,8 @@
 ---
 
 ### 1.2. 로그인
+
+- 로그인 기능입니다. 응답으로써 `user_id`는 필수적으로 제공되며, 셀럽의 경우 `celeb_id`를 제공하고, ceo의 경우 `ceo_id`를 제공합니다. 셀럽이나 ceo는 본인이 속한 회사의 `company_id`를 제공받습니다.
 - **POST** `/api/auth/login`
 - Body (JSON)
 
@@ -170,7 +172,10 @@
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
-  "user_id": 1
+  "user_id": 1,
+  "celeb_id": null,
+  "ceo_id": null,
+  "company_id": null
 }
 ```
 

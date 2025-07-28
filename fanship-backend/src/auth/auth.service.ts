@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CelebService } from '../celeb/celeb.service';
 import { plainToInstance } from 'class-transformer';
+import { Company } from '../company/company.entity';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,8 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private celebService: CelebService,
+    @InjectRepository(Company)
+    private companyRepository: Repository<Company>,
   ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {
@@ -99,10 +102,35 @@ export class AuthService {
     } catch (error) {
       throw new InternalServerErrorException('Failed to generate access token');
     }
-    return {
+
+    // 기본 응답
+    const response: any = {
       access_token: accessToken,
       user_id: user.userId,
+      celeb_id: null,
+      ceo_id: null,
+      company_id: null,
     };
+
+    if (user.position === 'celeb') {
+      // 셀럽 정보 조회
+      const celeb = await this.celebService.findCelebByUserId(user.userId);
+      if (celeb) {
+        response.celeb_id = celeb.celebId;
+        response.company_id = celeb.companyId;
+      }
+    } else if (user.position === 'ceo') {
+      // ceo가 소유한 회사 정보 조회
+      // 한 명의 ceo가 여러 회사에 속할 수 있다고 가정하지 않고, 첫 번째 회사만 반환
+      const company = await this.companyRepository.findOne({ where: { ceoId: user.userId } });
+      if (company) {
+        response.ceo_id = user.userId;
+        response.company_id = company.id;
+      } else {
+        response.ceo_id = user.userId;
+      }
+    }
+    return response;
   }
 
   async logout(token: string): Promise<{ message: string }> {

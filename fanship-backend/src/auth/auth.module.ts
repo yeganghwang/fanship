@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
 import { CelebModule } from '../celeb/celeb.module';
+import { Company } from '../company/company.entity';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { CelebModule } from '../celeb/celeb.module';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Company]),
     CelebModule,
   ],
   providers: [AuthService, JwtStrategy],
