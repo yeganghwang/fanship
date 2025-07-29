@@ -253,7 +253,32 @@
 
 ---
 
-### 1.7. 비밀번호 재설정 요청
+### 1.7. 비밀번호 변경
+- **POST** `/api/auth/change-password`
+- Header: Authorization: `Bearer <JWT_TOKEN>`
+- Body (JSON)
+
+| 필드명 | 타입 | 필수 여부 | 설명 | 비고 |
+| --- | --- | --- | --- | --- |
+| `currentPassword` | string | YES | 현재 비밀번호 | |
+| `newPassword` | string | YES | 새 비밀번호 | 최소 8자 |
+
+```json
+{
+  "current_password": "old_password123",
+  "new_password": "new_password123"
+}
+```
+- Response: 200 OK + 변경 성공 메시지
+```json
+{
+  "message": "Password changed successfully"
+}
+```
+
+---
+
+### 1.8. 비밀번호 재설정 요청 (구현 예정)
 - **POST** `/api/auth/password-reset-request`
 - Body (JSON)
 
@@ -275,7 +300,7 @@
 
 ---
 
-### 1.8. 비밀번호 재설정 확인
+### 1.9. 비밀번호 재설정 확인 (구현 예정)
 - **POST** `/api/auth/password-reset-confirm`
 - Body (JSON)
 

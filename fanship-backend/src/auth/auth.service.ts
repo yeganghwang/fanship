@@ -150,7 +150,7 @@ export class AuthService {
     }
 
     // 현재 비밀번호 확인
-    const isCurrentPasswordValid = await bcrypt.compare(changePasswordDto.currentPassword, user.password);
+    const isCurrentPasswordValid = await bcrypt.compare(changePasswordDto.current_password, user.password);
     if (!isCurrentPasswordValid) {
       throw new UnauthorizedException('Current password is incorrect');
     }
@@ -158,7 +158,7 @@ export class AuthService {
     // 새 비밀번호 해싱
     let hashedNewPassword;
     try {
-      hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
+      hashedNewPassword = await bcrypt.hash(changePasswordDto.new_password, 10);
     } catch (error) {
       throw new InternalServerErrorException('Failed to hash new password');
     }
