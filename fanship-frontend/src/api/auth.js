@@ -50,3 +50,19 @@ export const passwordResetConfirm = async (token, newPassword) => {
     throw error.response.data;
   }
 };
+
+export const changePassword = async (currentPassword, newPassword, token) => {
+  try {
+    const response = await axios.post(`${API_URL}/change-password`, {
+      current_password: currentPassword,
+      new_password: newPassword,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

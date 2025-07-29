@@ -76,14 +76,14 @@ function App() {
                   />
                 } />
                 <Route path="/profile" element={<UserProfilePage userId={userId} token={token} />} />
-                <Route path="/*" element={<Navigate to="/" replace />} /> {/* 로그인 후 다른 경로 접근 시 홈으로 리다이렉트 */}
+                <Route path="/*" element={<Navigate to="/" replace />} />
               </>
             ) : (
               <>
                 <Route path="/" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
                 <Route path="/password-reset-request" element={<PasswordResetRequestPage />} />
                 <Route path="/password-reset-confirm" element={<PasswordResetConfirmPage />} />
-                <Route path="/*" element={<Navigate to="/" replace />} /> {/* 로그인 전 다른 경로 접근 시 로그인 페이지로 리다이렉트 */}
+                <Route path="/*" element={<Navigate to="/" replace />} />
               </>
             )}
           </Routes>

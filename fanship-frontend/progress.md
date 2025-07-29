@@ -24,7 +24,23 @@
 - `src/pages/PasswordResetConfirmPage.js`에 비밀번호 재설정 확인 페이지 구현.
 - `App.js`에 비밀번호 재설정 관련 라우팅 추가 (`/password-reset-request`, `/password-reset-confirm`).
 
-### 4. 다음 작업: 회사/셀럽 관련 기능 구현
+### 4. 비밀번호 변경 기능 수정 완료
+- `api/auth.js`에 `changePassword` 함수 추가.
+- `src/components/user/UserProfileEditForm.js`에서 비밀번호 관련 필드 제거.
+- `src/components/user/ChangePasswordForm.js`에 비밀번호 변경 폼 컴포넌트 구현.
+- `src/pages/ChangePasswordPage.js` 삭제.
+- `src/pages/UserProfilePage.js`에 비밀번호 변경 폼 통합 및 토글 기능 추가.
+- `App.js`에서 비밀번호 변경 라우팅 제거 및 내비게이션 링크 제거.
+
+### 5. 비밀번호 확인 필드 및 실시간 유효성 검사 추가 완료
+- `src/components/user/ChangePasswordForm.js`에 `confirmNewPassword` 필드 추가 및 실시간 일치 유효성 검사 구현.
+- `src/components/auth/RegisterForm.js`에 `confirmPassword` 필드 추가 및 실시간 일치 유효성 검사 구현.
+
+### 6. 비밀번호 길이 유효성 검사 추가 완료
+- `src/components/user/ChangePasswordForm.js`에 새 비밀번호 최소 8자 길이 유효성 검사 추가.
+- `src/components/auth/RegisterForm.js`에 비밀번호 최소 8자 길이 유효성 검사 추가.
+
+### 7. 다음 작업: 회사/셀럽 관련 기능 구현
 - `api/company.js` 및 `api/celeb.js` 파일 생성 예정.
 - `src/components/company` 및 `src/components/celeb` 디렉토리 생성 예정.
 - `src/pages/CompanyListPage.js`, `src/pages/CompanyDetailPage.js`, `src/pages/CelebDetailPage.js` 등 페이지 생성 예정.

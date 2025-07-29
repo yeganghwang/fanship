@@ -3,7 +3,6 @@ import { updateUserProfile } from '../../api/user';
 
 function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
   const [nickname, setNickname] = useState(initialData.nickname || '');
-  const [password, setPassword] = useState('');
   const [pfpImgUrl, setPfpImgUrl] = useState(initialData.pfp_img_url || '');
   const [igUrl, setIgUrl] = useState(initialData.ig_url || '');
   const [message, setMessage] = useState('');
@@ -22,9 +21,6 @@ function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
         pfp_img_url: pfpImgUrl,
         ig_url: igUrl,
       };
-      if (password) {
-        updateData.password = password;
-      }
       const data = await updateUserProfile(userId, updateData, token);
       setMessage('프로필이 성공적으로 업데이트되었습니다.');
       onUpdateSuccess(data); // 부모 컴포넌트에 업데이트된 데이터 전달
@@ -39,10 +35,6 @@ function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
       <div>
         <label>닉네임:</label>
         <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} />
-      </div>
-      <div>
-        <label>새 비밀번호 (변경 시에만 입력):</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
       <div>
         <label>프로필 이미지 URL:</label>
