@@ -23,8 +23,8 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(['manager', 'fan', 'celeb', 'ceo']) // 허용된 값 목록 추가
-  position: string; // manager, fan, celeb, ceo
+  @IsIn(['fan', 'celeb']) // 허용된 값 목록 추가
+  position: string; // fan, celeb
 
   @IsOptional()
   @IsDateString()

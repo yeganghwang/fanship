@@ -63,17 +63,6 @@ export class UserController {
     // throw new NotImplementedException('User deletion is not yet implemented.');
   }
 
-  @Post('password-reset-request')
-  @HttpCode(HttpStatus.OK)
-  async requestPasswordReset(@Body() passwordResetRequestDto: PasswordResetRequestDto): Promise<void> {
-    await this.userService.requestPasswordReset(passwordResetRequestDto.mail);
-  }
-
-  @Post('password-reset-confirm')
-  @HttpCode(HttpStatus.OK)
-  async confirmPasswordReset(@Body() passwordResetConfirmDto: PasswordResetConfirmDto): Promise<void> {
-    await this.userService.confirmPasswordReset(passwordResetConfirmDto.token, passwordResetConfirmDto.new_password);
-  }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':userId/favorites')

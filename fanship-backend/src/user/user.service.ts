@@ -47,17 +47,19 @@ export class UserService {
       }
     }
 
-    // 비밀번호 해싱
-    if (updateUserDto.password) {
-      try {
-        updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-      } catch (error) {
-        throw new InternalServerErrorException('Failed to hash password');
-      }
+
+
+    // 빈 문자열을 null로 변환
+    const processedUpdateData = { ...updateUserDto };
+    if (processedUpdateData.pfp_img_url === '') {
+      processedUpdateData.pfp_img_url = null;
+    }
+    if (processedUpdateData.ig_url === '') {
+      processedUpdateData.ig_url = null;
     }
 
     // 업데이트할 필드만 적용
-    Object.assign(user, updateUserDto);
+    Object.assign(user, processedUpdateData);
 
     const updatedUser = await this.usersRepository.save(user);
 
@@ -74,36 +76,5 @@ export class UserService {
     return updatedUser;
   }
 
-  async requestPasswordReset(mail: string): Promise<void> {
-    const user = await this.usersRepository.findOne({ where: { mail } });
-    if (!user) {
-      // 보안상 사용자가 존재하지 않아도 성공으로 응답
-      console.log(`Password reset requested for non-existent email: ${mail}`);
-      return;
-    }
 
-    // TODO: 비밀번호 재설정 토큰 생성 및 이메일 전송 로직 구현
-    // 현재는 플레이스홀더
-    console.log(`Password reset token would be sent to ${mail}`);
-  }
-
-  async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
-    // TODO: 토큰 유효성 검사 및 비밀번호 재설정 로직 구현
-    // 현재는 플레이스홀더
-    console.log(`Password reset confirmed with token: ${token}`);
-
-    // 예시: 토큰이 유효하다고 가정하고 사용자 비밀번호 업데이트
-    const user = await this.usersRepository.findOne({ where: { /* 토큰으로 사용자 찾기 */ } }); // 실제 구현에서는 토큰을 통해 사용자를 찾아야 합니다.
-    if (!user) {
-      throw new NotFoundException('Invalid or expired token');
-    }
-
-    try {
-      user.password = await bcrypt.hash(newPassword, 10);
-      await this.usersRepository.save(user);
-      console.log(`Password for user ${user.userId} has been reset.`);
-    } catch (error) {
-      throw new InternalServerErrorException('Failed to reset password');
-    }
-  }
 }

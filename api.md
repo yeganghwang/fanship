@@ -175,7 +175,8 @@
   "user_id": 1,
   "celeb_id": null,
   "ceo_id": null,
-  "company_id": null
+  "company_id": null,
+  "position": "fan"
 }
 ```
 
