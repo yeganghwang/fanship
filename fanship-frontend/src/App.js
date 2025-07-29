@@ -1,50 +1,34 @@
 import React, { useState } from 'react';
-import { register, login, logout } from './api/auth';
-import './App.css'; // 기본 CSS 파일 사용
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { logout } from './api/auth';
+import './App.css';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import UserProfilePage from './pages/UserProfilePage';
+import PasswordResetRequestPage from './pages/PasswordResetRequestPage';
+import PasswordResetConfirmPage from './pages/PasswordResetConfirmPage';
 
 function App() {
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [mail, setMail] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [position, setPosition] = useState('fan'); // 기본값 'fan'
-  const [message, setMessage] = useState('');
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [userId, setUserId] = useState(localStorage.getItem('userId') || '');
+  const [companyId, setCompanyId] = useState(localStorage.getItem('companyId') || '');
+  const [celebId, setCelebId] = useState(localStorage.getItem('celebId') || '');
+  const [ceoId, setCeoId] = useState(localStorage.getItem('ceoId') || '');
+  const [position, setPosition] = useState(localStorage.getItem('position') || '');
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      const userData = { username, password, mail, nickname, position };
-      const data = await register(userData);
-      setMessage(`회원가입 성공: ${data.username}`);
-      setIsRegistering(false); // 회원가입 성공 후 로그인 폼으로 전환
-      setUsername('');
-      setPassword('');
-      setMail('');
-      setNickname('');
-      setPosition('fan');
-    } catch (error) {
-      setMessage(`회원가입 실패: ${error.message || '알 수 없는 오류'}`);
-    }
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const credentials = { username, password };
-      const data = await login(credentials);
-      setToken(data.access_token);
-      setUserId(data.user_id);
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('userId', data.user_id);
-      setMessage(`로그인 성공! 환영합니다, ${username}!`);
-      setUsername('');
-      setPassword('');
-    } catch (error) {
-      setMessage(`로그인 실패: ${error.message || '알 수 없는 오류'}`);
-    }
+  const handleLoginSuccess = (data) => {
+    setToken(data.access_token);
+    setUserId(data.user_id);
+    setPosition(data.position);
+    setCompanyId(data.company_id);
+    setCelebId(data.celeb_id);
+    setCeoId(data.ceo_id);
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('userId', data.user_id);
+    localStorage.setItem('companyId', data.company_id);
+    localStorage.setItem('celebId', data.celeb_id);
+    localStorage.setItem('ceoId', data.ceo_id);
+    localStorage.setItem('position', data.position);
   };
 
   const handleLogout = async () => {
@@ -52,93 +36,60 @@ function App() {
       await logout(token);
       setToken('');
       setUserId('');
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      setMessage('로그아웃 되었습니다.');
+      setCompanyId('');
+      setCelebId('');
+      setCeoId('');
+      setPosition('');
+      localStorage.clear();
     } catch (error) {
-      setMessage(`로그아웃 실패: ${error.message || '알 수 없는 오류'}`);
+      console.error('로그아웃 실패:', error);
     }
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Fanship Frontend</h1>
-        {token ? (
-          <div>
-            <p>{message}</p>
-            <p>현재 로그인된 사용자 ID: {userId}</p>
-            <button onClick={handleLogout}>로그아웃</button>
-          </div>
-        ) : (
-          <div>
-            {isRegistering ? (
-              <form onSubmit={handleRegister}>
-                <h2>회원가입</h2>
-                <input
-                  type="text"
-                  placeholder="사용자 이름"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="비밀번호"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <input
-                  type="email"
-                  placeholder="이메일"
-                  value={mail}
-                  onChange={(e) => setMail(e.target.value)}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="닉네임"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  required
-                />
-                <select value={position} onChange={(e) => setPosition(e.target.value)}>
-                  <option value="fan">fan</option>
-                  <option value="manager">manager</option>
-                  <option value="celeb">celeb</option>
-                  <option value="ceo">ceo</option>
-                </select>
-                <button type="submit">회원가입</button>
-                <button type="button" onClick={() => setIsRegistering(false)}>로그인으로 돌아가기</button>
-                <p>{message}</p>
-              </form>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          {token ? (
+            <nav>
+              <Link to="/">홈</Link> |
+              <Link to="/profile">내 프로필</Link> |
+              <button onClick={handleLogout}>로그아웃</button>
+            </nav>
+          ) : (
+            <nav>
+              <Link to="/">로그인</Link> |
+              <Link to="/password-reset-request">비밀번호 재설정</Link>
+            </nav>
+          )}
+          <Routes>
+            {token ? (
+              <>
+                <Route path="/" element={
+                  <HomePage
+                    userId={userId}
+                    position={position}
+                    companyId={companyId}
+                    celebId={celebId}
+                    ceoId={ceoId}
+                    onLogout={handleLogout}
+                  />
+                } />
+                <Route path="/profile" element={<UserProfilePage userId={userId} token={token} />} />
+                <Route path="/*" element={<Navigate to="/" replace />} /> {/* 로그인 후 다른 경로 접근 시 홈으로 리다이렉트 */}
+              </>
             ) : (
-              <form onSubmit={handleLogin}>
-                <h2>로그인</h2>
-                <input
-                  type="text"
-                  placeholder="사용자 이름"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="비밀번호"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button type="submit">로그인</button>
-                <button type="button" onClick={() => setIsRegistering(true)}>회원가입</button>
-                <p>{message}</p>
-              </form>
+              <>
+                <Route path="/" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+                <Route path="/password-reset-request" element={<PasswordResetRequestPage />} />
+                <Route path="/password-reset-confirm" element={<PasswordResetConfirmPage />} />
+                <Route path="/*" element={<Navigate to="/" replace />} /> {/* 로그인 전 다른 경로 접근 시 로그인 페이지로 리다이렉트 */}
+              </>
             )}
-          </div>
-        )}
-      </header>
-    </div>
+          </Routes>
+        </header>
+      </div>
+    </Router>
   );
 }
 

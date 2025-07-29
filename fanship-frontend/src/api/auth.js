@@ -32,3 +32,21 @@ export const logout = async (token) => {
     throw error.response.data;
   }
 };
+
+export const passwordResetRequest = async (mail) => {
+  try {
+    const response = await axios.post(`${API_URL}/password-reset-request`, { mail });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const passwordResetConfirm = async (token, newPassword) => {
+  try {
+    const response = await axios.post(`${API_URL}/password-reset-confirm`, { token, new_password: newPassword });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
