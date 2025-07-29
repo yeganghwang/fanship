@@ -24,10 +24,11 @@ export class CompanyController {
   @Get()
   async findAll(
     @Query('region') region?: string,
+    @Query('company_name') companyName?: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ): Promise<PaginatedResult<any>> {
-    return this.companyService.findAll(region, page, limit);
+    return this.companyService.findAll(region, companyName, page, limit);
   }
 
   @Get(':companyId/celebs')

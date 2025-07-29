@@ -335,7 +335,7 @@
 | --- | --- | --- | --- | --- |
 | `company_name` | string | YES | 회사명 | |
 | `company_type` | string | YES | 회사 형태 | |
-| `region` | string | YES | 지역명 | Optional(생략 시 모든 회사 정보 반환) |
+| `region` | string | YES | 지역명 | 회사 소속 지역 |
 
 ```json
 {
@@ -360,6 +360,7 @@
 - **GET** `/api/companies`
 - Query: 
   - `region` (String, Optional): 지역별 필터링 (생략 시 모든 회사 정보 반환)
+  - `company_name` (String, Optilnal) : 회사 이름 필터링 (생략 시 모든 회사 정보 반환)
   - `page` (Number, Optional): 페이지 번호 (기본값: 1)
   - `limit` (Number, Optional): 페이지당 항목 수 (기본값: 20, 최대값: 100)
 - Response: 200 OK + 회사 리스트

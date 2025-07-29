@@ -52,11 +52,24 @@ export class CompanyService {
     };
   }
 
-  async findAll(region?: string, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
+  async findAll(region?: string, companyName?: string, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const query = this.companyRepository.createQueryBuilder('company');
 
+    const conditions: string[] = [];
+    const parameters: any = {};
+
     if (region) {
-      query.where('company.region = :region', { region });
+      conditions.push('company.region = :region');
+      parameters['region'] = region;
+    }
+
+    if (companyName) {
+      conditions.push('company.company_name LIKE :companyName');
+      parameters['companyName'] = `%${companyName}%`;
+    }
+
+    if (conditions.length > 0) {
+      query.where(conditions.join(' AND '), parameters);
     }
 
     // 총 개수 조회
