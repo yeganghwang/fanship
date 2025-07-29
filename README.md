@@ -11,5 +11,9 @@
   - 로그인 기록 확인
 - 데이터베이스 명세 : [db_structure.md](db_structure.md)
 - REST API 명세 : [api.md](api.md)
-- 진행상황 : [progress.md](progress.md)
+- 진행상황 : [fanship-frontend/progress.md](fanship-frontend/progress.md)
 ---
+
+# 서버 - 클라이언트 환경
+- 서버 : NestJS
+- 클라이언트 : React
