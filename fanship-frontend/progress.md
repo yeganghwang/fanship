@@ -40,7 +40,26 @@
 - `src/components/user/ChangePasswordForm.js`에 새 비밀번호 최소 8자 길이 유효성 검사 추가.
 - `src/components/auth/RegisterForm.js`에 비밀번호 최소 8자 길이 유효성 검사 추가.
 
-### 7. 다음 작업: 회사/셀럽 관련 기능 구현
-- `api/company.js` 및 `api/celeb.js` 파일 생성 예정.
-- `src/components/company` 및 `src/components/celeb` 디렉토리 생성 예정.
-- `src/pages/CompanyListPage.js`, `src/pages/CompanyDetailPage.js`, `src/pages/CelebDetailPage.js` 등 페이지 생성 예정.
+### 7. 회사/셀럽 관련 기능 구현 시작
+- `api/company.js` 파일 생성 및 `createCompany`, `getCompanyList`, `getCelebsByCompanyId` 함수 구현.
+- `api/celeb.js` 파일 생성 및 `getCelebDetail` 함수 구현.
+- `src/components/company` 및 `src/components/celeb` 디렉토리 생성.
+- `src/components/company/CompanyList.js`에 회사 목록 표시 컴포넌트 구현.
+- `src/pages/CompanyListPage.js`에 회사 목록 페이지 구현.
+- `App.js`에 회사 목록 라우팅 추가 (`/companies`).
+
+### 8. 회사 상세 및 셀럽 상세 페이지 구현 완료
+- `src/pages/CompanyDetailPage.js`에 회사 상세 페이지 구현 (회사 소속 셀럽 목록 포함).
+- `src/pages/CelebDetailPage.js`에 셀럽 상세 페이지 구현.
+- `App.js`에 회사 상세 (`/companies/:companyId`) 및 셀럽 상세 (`/celebs/:celebId`) 라우팅 추가.
+- `src/components/company/CompanyList.js`에서 회사 상세 페이지로 이동하는 링크 추가.
+- `src/pages/CompanyDetailPage.js`에서 셀럽 상세 페이지로 이동하는 링크 추가.
+
+### 9. 회사 목록 조회 기능 개선 완료
+- `src/components/company/CompanyList.js`에서 지역 필터를 탭 UI로 변경 (서울, 부산, 대구).
+- `src/components/company/CompanyList.js`에 회사 이름 검색 기능 추가 (검색 버튼 또는 엔터).
+
+### 10. 다음 작업: 즐겨찾기 관련 기능 구현
+- `api/favorite.js` 파일 생성 예정.
+- `src/components/favorite` 디렉토리 생성 예정.
+- `src/pages/FavoriteListPage.js` 등 페이지 생성 예정.

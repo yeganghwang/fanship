@@ -7,6 +7,9 @@ import LoginPage from './pages/LoginPage';
 import UserProfilePage from './pages/UserProfilePage';
 import PasswordResetRequestPage from './pages/PasswordResetRequestPage';
 import PasswordResetConfirmPage from './pages/PasswordResetConfirmPage';
+import CompanyListPage from './pages/CompanyListPage';
+import CompanyDetailPage from './pages/CompanyDetailPage';
+import CelebDetailPage from './pages/CelebDetailPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -54,6 +57,7 @@ function App() {
             <nav>
               <Link to="/">홈</Link> |
               <Link to="/profile">내 프로필</Link> |
+              <Link to="/companies">회사 목록</Link> |
               <button onClick={handleLogout}>로그아웃</button>
             </nav>
           ) : (
@@ -76,6 +80,9 @@ function App() {
                   />
                 } />
                 <Route path="/profile" element={<UserProfilePage userId={userId} token={token} />} />
+                <Route path="/companies" element={<CompanyListPage />} />
+                <Route path="/companies/:companyId" element={<CompanyDetailPage />} />
+                <Route path="/celebs/:celebId" element={<CelebDetailPage />} />
                 <Route path="/*" element={<Navigate to="/" replace />} />
               </>
             ) : (
