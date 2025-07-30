@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getCelebsByCompanyId } from '../api/company';
-import { addFavorite } from '../api/favorite';
+import { addFavorite, removeFavorite, getFavorites } from '../api/favorite';
 
-function CompanyDetailPage({ token }) {
+function CompanyDetailPage({ userId, token }) {
   const { companyId } = useParams();
   const [celebs, setCelebs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +11,25 @@ function CompanyDetailPage({ token }) {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [totalPages, setTotalPages] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteId, setFavoriteId] = useState(null);
+
+  const checkFavoriteStatus = async () => {
+    if (!userId || !token) return;
+    try {
+      const response = await getFavorites(userId, token, { limit: 100 }); // 모든 즐겨찾기 가져와서 확인
+      const found = response.list.find(fav => fav.company_id === parseInt(companyId, 10));
+      if (found) {
+        setIsFavorite(true);
+        setFavoriteId(found.favorite_id);
+      } else {
+        setIsFavorite(false);
+        setFavoriteId(null);
+      }
+    } catch (err) {
+      console.error('즐겨찾기 상태 확인 실패:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchCelebs = async () => {
@@ -28,15 +47,28 @@ function CompanyDetailPage({ token }) {
 
     if (companyId) {
       fetchCelebs();
+      checkFavoriteStatus();
     }
-  }, [companyId, page, limit]);
+  }, [companyId, page, limit, userId, token]);
 
   const handleAddFavorite = async () => {
     try {
       await addFavorite({ company_id: parseInt(companyId, 10) }, token);
       alert('즐겨찾기에 추가되었습니다.');
+      checkFavoriteStatus(); // 상태 업데이트
     } catch (err) {
       alert(`즐겨찾기 추가 실패: ${err.message || '알 수 없는 오류'}`);
+    }
+  };
+
+  const handleRemoveFavorite = async () => {
+    if (!favoriteId) return;
+    try {
+      await removeFavorite(favoriteId, token);
+      alert('즐겨찾기에서 삭제되었습니다.');
+      checkFavoriteStatus(); // 상태 업데이트
+    } catch (err) {
+      alert(`즐겨찾기 삭제 실패: ${err.message || '알 수 없는 오류'}`);
     }
   };
 
@@ -52,7 +84,13 @@ function CompanyDetailPage({ token }) {
   return (
     <div>
       <h2>회사 ID: {companyId} 소속 셀럽 목록</h2>
-      <button onClick={handleAddFavorite}>즐겨찾기 추가</button>
+      {token && ( // 로그인 상태일 때만 버튼 표시
+        isFavorite ? (
+          <button onClick={handleRemoveFavorite}>즐겨찾기 삭제</button>
+        ) : (
+          <button onClick={handleAddFavorite}>즐겨찾기 추가</button>
+        )
+      )}
       <ul>
         {celebs.map((celeb) => (
           <li key={celeb.celeb_id}>

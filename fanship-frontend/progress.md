@@ -1,6 +1,6 @@
 # 프론트엔드 개발 진행 상황
 
-## 2025년 7월 28일
+
 
 ### 1. 인증/사용자 기능 구현 (로그인, 회원가입) 완료
 - `api/auth.js`에 로그인, 회원가입, 로그아웃 API 연동 함수 구현.
@@ -24,8 +24,6 @@
 - `src/pages/PasswordResetConfirmPage.js`에 비밀번호 재설정 확인 페이지 구현.
 - `App.js`에 비밀번호 재설정 관련 라우팅 추가 (`/password-reset-request`, `/password-reset-confirm`).
 
-## 2025년 7월 29일
-
 ### 4. 비밀번호 변경 기능 수정 완료
 - `api/auth.js`에 `changePassword` 함수 추가.
 - `src/components/user/UserProfileEditForm.js`에서 비밀번호 관련 필드 제거.
@@ -37,8 +35,6 @@
 ### 5. 비밀번호 확인 필드 및 실시간 유효성 검사 추가 완료
 - `src/components/user/ChangePasswordForm.js`에 `confirmNewPassword` 필드 추가 및 실시간 일치 유효성 검사 구현.
 - `src/components/auth/RegisterForm.js`에 `confirmPassword` 필드 추가 및 실시간 일치 유효성 검사 구현.
-
-## 2025년 7월 30일
 
 ### 6. 비밀번호 길이 유효성 검사 추가 완료
 - `src/components/user/ChangePasswordForm.js`에 새 비밀번호 최소 8자 길이 유효성 검사 추가.
@@ -76,7 +72,12 @@
 ### 12. 즐겨찾기 목록 페이지 개선 완료
 - `src/components/favorite/FavoriteList.js`에서 즐겨찾기 항목 클릭 시 해당 상세 페이지로 이동하는 링크 추가.
 
-### 13. 다음 작업: 게시판 관련 기능 구현
+### 13. 즐겨찾기 개선 완료 (상세 페이지에서 즐겨찾기 삭제 기능 추가)
+- `App.js`에서 `CompanyDetailPage`와 `CelebDetailPage`에 `userId` prop 전달.
+- `CompanyDetailPage.js`에 즐겨찾기 상태 확인 및 추가/삭제 버튼 조건부 렌더링 로직 추가.
+- `CelebDetailPage.js`에 즐겨찾기 상태 확인 및 추가/삭제 버튼 조건부 렌더링 로직 추가.
+
+### 14. 다음 작업: 게시판 관련 기능 구현
 - `api/post.js` 파일 생성 예정.
 - `src/components/post` 디렉토리 생성 예정.
 - `src/pages/PostListPage.js`, `src/pages/PostDetailPage.js`, `src/pages/PostCreatePage.js` 등 페이지 생성 예정.
