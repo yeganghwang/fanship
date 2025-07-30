@@ -63,7 +63,20 @@
 - `src/components/company/CompanyList.js`에서 지역 필터를 탭 UI로 변경 (서울, 부산, 대구).
 - `src/components/company/CompanyList.js`에 회사 이름 검색 기능 추가 (검색 버튼 또는 엔터).
 
-### 10. 다음 작업: 즐겨찾기 관련 기능 구현
-- `api/favorite.js` 파일 생성 예정.
-- `src/components/favorite` 디렉토리 생성 예정.
-- `src/pages/FavoriteListPage.js` 등 페이지 생성 예정.
+### 10. 즐겨찾기 관련 기능 구현 시작
+- `api/favorite.js` 파일 생성 및 `addFavorite`, `removeFavorite`, `getFavorites` 함수 구현.
+- `src/components/favorite` 디렉토리 생성.
+- `src/components/favorite/FavoriteList.js`에 즐겨찾기 목록 표시 컴포넌트 구현.
+- `src/pages/FavoriteListPage.js`에 즐겨찾기 목록 페이지 구현.
+- `App.js`에 즐겨찾기 라우팅 추가 (`/favorites`).
+
+### 11. 즐겨찾기 추가 기능 구현 완료
+- `CompanyDetailPage.js` 및 `CelebDetailPage.js`에 즐겨찾기 추가 버튼 구현.
+
+### 12. 즐겨찾기 목록 페이지 개선 완료
+- `src/components/favorite/FavoriteList.js`에서 즐겨찾기 항목 클릭 시 해당 상세 페이지로 이동하는 링크 추가.
+
+### 13. 다음 작업: 게시판 관련 기능 구현
+- `api/post.js` 파일 생성 예정.
+- `src/components/post` 디렉토리 생성 예정.
+- `src/pages/PostListPage.js`, `src/pages/PostDetailPage.js`, `src/pages/PostCreatePage.js` 등 페이지 생성 예정.
