@@ -11,6 +11,10 @@ import CompanyListPage from './pages/CompanyListPage';
 import CompanyDetailPage from './pages/CompanyDetailPage';
 import CelebDetailPage from './pages/CelebDetailPage';
 import FavoriteListPage from './pages/FavoriteListPage';
+import PostListPage from './pages/PostListPage';
+import PostDetailPage from './pages/PostDetailPage';
+import PostCreatePage from './pages/PostCreatePage';
+import PostEditPage from './pages/PostEditPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -60,6 +64,7 @@ function App() {
               <Link to="/profile">내 프로필</Link> |
               <Link to="/companies">회사 목록</Link> |
               <Link to="/favorites">즐겨찾기</Link> |
+              <Link to="/posts">게시판</Link> |
               <button onClick={handleLogout}>로그아웃</button>
             </nav>
           ) : (
@@ -86,6 +91,10 @@ function App() {
                 <Route path="/companies/:companyId" element={<CompanyDetailPage userId={userId} token={token} />} />
                 <Route path="/celebs/:celebId" element={<CelebDetailPage userId={userId} token={token} />} />
                 <Route path="/favorites" element={<FavoriteListPage userId={userId} token={token} />} />
+                <Route path="/posts" element={<PostListPage />} />
+                <Route path="/posts/create" element={<PostCreatePage token={token} />} />
+                <Route path="/posts/:postId" element={<PostDetailPage userId={userId} token={token} position={position} companyId={companyId} />} />
+                <Route path="/posts/:postId/edit" element={<PostEditPage token={token} />} />
                 <Route path="/*" element={<Navigate to="/" replace />} />
               </>
             ) : (

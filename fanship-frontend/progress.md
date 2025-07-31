@@ -1,6 +1,6 @@
 # 프론트엔드 개발 진행 상황
 
-
+## 2025년 7월 28일
 
 ### 1. 인증/사용자 기능 구현 (로그인, 회원가입) 완료
 - `api/auth.js`에 로그인, 회원가입, 로그아웃 API 연동 함수 구현.
@@ -77,7 +77,35 @@
 - `CompanyDetailPage.js`에 즐겨찾기 상태 확인 및 추가/삭제 버튼 조건부 렌더링 로직 추가.
 - `CelebDetailPage.js`에 즐겨찾기 상태 확인 및 추가/삭제 버튼 조건부 렌더링 로직 추가.
 
-### 14. 다음 작업: 게시판 관련 기능 구현
-- `api/post.js` 파일 생성 예정.
-- `src/components/post` 디렉토리 생성 예정.
-- `src/pages/PostListPage.js`, `src/pages/PostDetailPage.js`, `src/pages/PostCreatePage.js` 등 페이지 생성 예정.
+### 14. 게시판 관련 기능 구현 완료
+- `api/post.js` 파일 생성 및 게시판 CRUD API 함수 구현.
+- `src/components/post` 디렉토리 생성.
+- `src/components/post/PostList.js`에 게시글 목록 표시 컴포넌트 구현.
+- `src/components/post/PostForm.js`에 게시글 작성/수정 폼 컴포넌트 구현.
+- `src/pages/PostListPage.js`에 게시글 목록 페이지 구현 및 글쓰기 버튼 추가.
+- `src/pages/PostDetailPage.js`에 게시글 상세 페이지 구현 및 권한에 따른 수정/삭제 버튼 표시.
+- `src/pages/PostCreatePage.js`에 게시글 작성 페이지 구현.
+- `src/pages/PostEditPage.js`에 게시글 수정 페이지 구현.
+- `App.js`에 게시판 관련 라우팅 추가 (`/posts`, `/posts/create`, `/posts/:postId`, `/posts/:postId/edit`).
+
+### 15. 게시판 목록 조회 로직 수정 완료
+- `src/components/post/PostList.js`에서 `notice` 파라미터를 `true`일 때만 API 요청에 포함하도록 수정.
+
+### 16. 게시글 작성 오류 수정 완료
+- `src/components/post/PostForm.js`의 `useEffect` 로직을 수정하여 `initialData`가 있을 때만 실행되도록 변경.
+
+### 17. 게시판 목록 UI 개선 완료
+- `src/components/post/PostList.js`에서 "공지사항만 보기" 체크박스를 "전체"와 "공지" 탭으로 변경.
+
+### 18. 게시글 작성일 표시 형식 변경 완료
+- `date-fns` 및 `date-fns-tz` 라이브러리 설치.
+- `src/utils/date.js`에 UTC를 KST로 변환하는 `formatToKST` 유틸리티 함수 생성.
+- `src/components/post/PostList.js`와 `src/pages/PostDetailPage.js`에서 `formatToKST` 함수를 사용하여 날짜 형식을 `YYYY-MM-DD HH:MM:SS`로 변경.
+
+### 19. 게시글 조회 보안 및 UI 개선 완료
+- `src/pages/PostDetailPage.js`에서 `dangerouslySetInnerHTML`을 제거하고, CSS의 `white-space: 'pre-wrap'` 속성을 사용하여 XSS 공격을 방지하고 줄바꿈을 올바르게 표시하도록 수정.
+
+### 20. 다음 작업: 굿즈 관련 기능 구현
+- `api/goods.js` 파일 생성 예정.
+- `src/components/goods` 디렉토리 생성 예정.
+- `src/pages/GoodsListPage.js`, `src/pages/GoodsDetailPage.js`, `src/pages/GoodsCreatePage.js` 등 페이지 생성 예정.
