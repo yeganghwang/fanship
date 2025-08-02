@@ -412,7 +412,8 @@
     "has_next": false,
     "has_prev": false
   },
-  "ceo_id": 3
+  "ceo_id": 3,
+  "company_name": "땡큐기획사"
 }
 ```
 
