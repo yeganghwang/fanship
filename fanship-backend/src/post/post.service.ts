@@ -99,7 +99,7 @@ export class PostService {
       writer_id: post.writerId,
       nickname: post.writer.nickname,
       title: post.title,
-      created_at: post.createdAt.toISOString().split('T')[0], // YYYY-MM-DD 형식
+      created_at: post.createdAt.toISOString(),
       views: post.views,
       notice: post.notice,
     }));

@@ -71,7 +71,7 @@ export class CommentService {
       writer_id: comment.writerId,
       nickname: comment.writer.nickname,
       content: comment.content,
-      created_at: comment.createdAt.toISOString().split('T')[0], // YYYY-MM-DD 형식
+      created_at: comment.createdAt.toISOString(),
     }));
 
     const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
