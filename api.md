@@ -411,7 +411,8 @@
     "limit": 20,
     "has_next": false,
     "has_prev": false
-  }
+  },
+  "ceo_id": 3
 }
 ```
 
@@ -423,6 +424,7 @@
 - Response: 200 OK + 셀럽 정보
 ```json
 {
+  "user_id": 1,
   "nickname": "스타001",
   "celeb_type": "가수",
   "company_name": "스타기획사",

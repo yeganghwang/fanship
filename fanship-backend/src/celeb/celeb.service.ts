@@ -83,6 +83,7 @@ export class CelebService {
       .where('celeb.celebId = :celebId', { celebId })
       .select([
         'celeb.celebId',
+        'celeb.userId',
         'user.nickname',
         'celeb.celeb_type',
         'company.company_name',
@@ -97,6 +98,7 @@ export class CelebService {
     }
 
     return {
+      user_id: celeb.userId, // user_id 추가
       nickname: celeb.user.nickname,
       celeb_type: celeb.celeb_type,
       company_name: celeb.company.company_name,
