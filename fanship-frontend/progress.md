@@ -105,7 +105,24 @@
 ### 19. 게시글 조회 보안 및 UI 개선 완료
 - `src/pages/PostDetailPage.js`에서 `dangerouslySetInnerHTML`을 제거하고, CSS의 `white-space: 'pre-wrap'` 속성을 사용하여 XSS 공격을 방지하고 줄바꿈을 올바르게 표시하도록 수정.
 
-### 20. 다음 작업: 굿즈 관련 기능 구현
+### 20. 게시판 기능 고도화 및 댓글 기능 구현 완료
+- `api/post.js`에 `getPostsByUserId` 함수 추가.
+- `CelebDetailPage.js`에서 `getPostsByUserId`를 사용하여 해당 셀럽의 게시글 목록 표시.
+- `CompanyDetailPage.js`에서 `getPostsByUserId`를 사용하여 해당 회사 CEO의 게시글 목록 표시.
+- `PostList.js`에서 작성자 이름을 클릭하면 해당 작성자의 프로필 페이지로 이동하는 링크 추가.
+- `api/comment.js` 파일 생성 및 댓글 CRUD API 함수 구현.
+- `src/components/comment` 디렉토리 생성.
+- `src/components/comment/CommentList.js`에 댓글 목록 표시 및 권한에 따른 삭제 버튼 구현.
+- `src/components/comment/CommentForm.js`에 댓글 작성 폼 구현.
+- `PostDetailPage.js`에 댓글 목록 및 작성 폼 추가.
+
+### 21. 회사 상세 페이지 오류 수정 완료
+- `CompanyDetailPage.js`에서 `getCompanyList`를 사용하여 전체 회사 목록을 가져온 후, `companyId`와 일치하는 회사를 찾아 `ceo_id`를 사용하도록 로직 수정.
+
+### 22. 게시판 작성자 프로필 링크 오류 수정 완료
+- `src/pages/PublicProfilePage.js` 생성 및 `App.js`에 라우팅 추가 (`/users/:userId`).
+
+### 23. 다음 작업: 굿즈 관련 기능 구현
 - `api/goods.js` 파일 생성 예정.
 - `src/components/goods` 디렉토리 생성 예정.
 - `src/pages/GoodsListPage.js`, `src/pages/GoodsDetailPage.js`, `src/pages/GoodsCreatePage.js` 등 페이지 생성 예정.

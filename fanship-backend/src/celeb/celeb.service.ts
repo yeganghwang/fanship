@@ -36,7 +36,7 @@ export class CelebService {
     return this.celebRepository.save(newCeleb);
   }
 
-  async findCelebsByCompanyId(companyId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
+  async findCelebsByCompanyId(companyId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any> & { ceo_id: number, company_name: string }> {
     const company = await this.companyService.findOneById(companyId);
     if (!company) {
       throw new NotFoundException(`Company with ID ${companyId} not found`);
@@ -50,6 +50,7 @@ export class CelebService {
         'celeb.celebId',
         'user.nickname',
         'celeb.celeb_type',
+        'celeb.userId',
       ]);
 
     // 총 개수 조회
@@ -65,6 +66,7 @@ export class CelebService {
       celeb_id: celeb.celebId,
       nickname: celeb.user.nickname,
       celeb_type: celeb.celeb_type,
+      user_id: celeb.userId,
     }));
 
     const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
@@ -72,6 +74,8 @@ export class CelebService {
     return {
       list,
       pagination,
+      ceo_id: company.ceoId,
+      company_name: company.company_name,
     };
   }
 
