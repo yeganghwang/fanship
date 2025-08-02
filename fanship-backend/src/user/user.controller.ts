@@ -79,7 +79,7 @@ export class UserController {
     return this.favoriteService.findFavoritesByUserId(requestedUserId, page, limit);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  //@UseGuards(AuthGuard('jwt'))
   @Get(':userId/posts')
   async getUserPosts(
     @Param('userId') userId: number, 
@@ -88,9 +88,9 @@ export class UserController {
     @Query('limit') limit?: number,
   ): Promise<PaginatedResult<any>> {
     const requestedUserId = Number(userId);
-    if (req.user.userId !== requestedUserId) {
-      // throw new ForbiddenException('You are not authorized to view this user\'s posts.');
-    }
+    // if (req.user.userId !== requestedUserId) {
+    //   throw new ForbiddenException('You are not authorized to view this user\'s posts.');
+    // }
     return this.postService.findPostsByUserId(requestedUserId, page, limit);
   }
 
