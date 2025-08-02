@@ -117,12 +117,23 @@
 - `PostDetailPage.js`에 댓글 목록 및 작성 폼 추가.
 
 ### 21. 회사 상세 페이지 오류 수정 완료
-- `CompanyDetailPage.js`에서 `getCompanyList`를 사용하여 전체 회사 목록을 가져온 후, `companyId`와 일치하는 회사를 찾아 `ceo_id`를 사용하도록 로직 수정.
+- `CompanyDetailPage.js`에서 `getCelebsByCompanyId` 응답에서 `ceo_id`와 `company_name`을 직접 사용하도록 로직 수정.
 
 ### 22. 게시판 작성자 프로필 링크 오류 수정 완료
 - `src/pages/PublicProfilePage.js` 생성 및 `App.js`에 라우팅 추가 (`/users/:userId`).
 
-### 23. 다음 작업: 굿즈 관련 기능 구현
-- `api/goods.js` 파일 생성 예정.
-- `src/components/goods` 디렉토리 생성 예정.
-- `src/pages/GoodsListPage.js`, `src/pages/GoodsDetailPage.js`, `src/pages/GoodsCreatePage.js` 등 페이지 생성 예정.
+### 23. 굿즈 관련 기능 구현 완료
+- `api/goods.js` 파일 생성 및 굿즈 CRUD API 함수 구현.
+- `src/components/goods` 디렉토리 생성.
+- `src/components/goods/GoodsList.js`에 굿즈 목록 표시 컴포넌트 구현.
+- `src/components/goods/GoodsForm.js`에 굿즈 작성/수정 폼 컴포넌트 구현.
+- `src/pages/GoodsListPage.js`에 굿즈 목록 페이지 구현 및 굿즈 등록 버튼 추가.
+- `src/pages/GoodsDetailPage.js`에 굿즈 상세 페이지 구현 및 권한에 따른 수정/삭제 버튼 표시.
+- `src/pages/GoodsCreatePage.js`에 굿즈 작성 페이지 구현.
+- `src/pages/GoodsEditPage.js`에 굿즈 수정 페이지 구현.
+- `App.js`에 굿즈 관련 라우팅 추가 (`/goods`, `/goods/create`, `/goods/:goodsId`, `/goods/:goodsId/edit`).
+
+### 24. 다음 작업: 스케줄 관련 기능 구현
+- `api/schedule.js` 파일 생성 예정.
+- `src/components/schedule` 디렉토리 생성 예정.
+- `src/pages/SchedulePage.js` 등 페이지 생성 예정.

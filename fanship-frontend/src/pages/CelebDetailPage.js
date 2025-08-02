@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { getCelebDetail } from '../api/celeb';
 import { addFavorite, removeFavorite, getFavorites } from '../api/favorite';
+import { getPostsByUserId } from '../api/post';
 
 function CelebDetailPage({ userId, token }) {
   const { celebId } = useParams();
   const [celebDetail, setCelebDetail] = useState(null);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -14,7 +16,7 @@ function CelebDetailPage({ userId, token }) {
   const checkFavoriteStatus = async () => {
     if (!userId || !token) return;
     try {
-      const response = await getFavorites(userId, token, { limit: 100 }); // 모든 즐겨찾기 가져와서 확인
+      const response = await getFavorites(userId, token, { limit: 100 });
       const found = response.list.find(fav => fav.celeb_id === parseInt(celebId, 10));
       if (found) {
         setIsFavorite(true);
@@ -29,21 +31,28 @@ function CelebDetailPage({ userId, token }) {
   };
 
   useEffect(() => {
-    const fetchCelebDetail = async () => {
+    const fetchCelebData = async () => {
       setLoading(true);
       try {
-        const response = await getCelebDetail(celebId);
-        setCelebDetail(response);
+        const celebResponse = await getCelebDetail(celebId);
+        setCelebDetail(celebResponse);
+
+        if (celebResponse && celebResponse.user_id) {
+          const postsResponse = await getPostsByUserId(celebResponse.user_id);
+          setPosts(postsResponse.list);
+        }
+
+        checkFavoriteStatus();
+
       } catch (err) {
-        setError(err.message || '셀럽 상세 정보를 불러오는데 실패했습니다.');
+        setError(err.message || '데이터를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
     };
 
     if (celebId) {
-      fetchCelebDetail();
-      checkFavoriteStatus();
+      fetchCelebData();
     }
   }, [celebId, userId, token]);
 
@@ -51,7 +60,7 @@ function CelebDetailPage({ userId, token }) {
     try {
       await addFavorite({ celeb_id: parseInt(celebId, 10) }, token);
       alert('즐겨찾기에 추가되었습니다.');
-      checkFavoriteStatus(); // 상태 업데이트
+      checkFavoriteStatus();
     } catch (err) {
       alert(`즐겨찾기 추가 실패: ${err.message || '알 수 없는 오류'}`);
     }
@@ -62,7 +71,7 @@ function CelebDetailPage({ userId, token }) {
     try {
       await removeFavorite(favoriteId, token);
       alert('즐겨찾기에서 삭제되었습니다.');
-      checkFavoriteStatus(); // 상태 업데이트
+      checkFavoriteStatus();
     } catch (err) {
       alert(`즐겨찾기 삭제 실패: ${err.message || '알 수 없는 오류'}`);
     }
@@ -75,7 +84,7 @@ function CelebDetailPage({ userId, token }) {
   return (
     <div>
       <h2>{celebDetail.nickname} 상세 정보</h2>
-      {token && ( // 로그인 상태일 때만 버튼 표시
+      {token && (
         isFavorite ? (
           <button onClick={handleRemoveFavorite}>즐겨찾기 삭제</button>
         ) : (
@@ -87,6 +96,15 @@ function CelebDetailPage({ userId, token }) {
       {celebDetail.ig_url && <p>인스타그램: <a href={celebDetail.ig_url} target="_blank" rel="noopener noreferrer">{celebDetail.ig_url}</a></p>}
       {celebDetail.pfp_img_url && <p>프로필 이미지: <img src={celebDetail.pfp_img_url} alt="프로필" style={{ width: '100px', height: '100px' }} /></p>}
       {celebDetail.dob && <p>생년월일: {celebDetail.dob}</p>}
+
+      <h3>작성한 게시글</h3>
+      <ul>
+        {posts.map(post => (
+          <li key={post.post_id}>
+            <Link to={`/posts/${post.post_id}`}>{post.title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

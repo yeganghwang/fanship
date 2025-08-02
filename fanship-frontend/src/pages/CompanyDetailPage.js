@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getCelebsByCompanyId } from '../api/company';
 import { addFavorite, removeFavorite, getFavorites } from '../api/favorite';
+import { getPostsByUserId } from '../api/post';
 
 function CompanyDetailPage({ userId, token }) {
   const { companyId } = useParams();
+  const [companyName, setCompanyName] = useState('');
+  const [company, setCompany] = useState(null);
   const [celebs, setCelebs] = useState([]);
+  const [ceoPosts, setCeoPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -17,7 +21,7 @@ function CompanyDetailPage({ userId, token }) {
   const checkFavoriteStatus = async () => {
     if (!userId || !token) return;
     try {
-      const response = await getFavorites(userId, token, { limit: 100 }); // 모든 즐겨찾기 가져와서 확인
+      const response = await getFavorites(userId, token, { limit: 100 });
       const found = response.list.find(fav => fav.company_id === parseInt(companyId, 10));
       if (found) {
         setIsFavorite(true);
@@ -32,22 +36,31 @@ function CompanyDetailPage({ userId, token }) {
   };
 
   useEffect(() => {
-    const fetchCelebs = async () => {
+    const fetchCompanyData = async () => {
       setLoading(true);
       try {
-        const response = await getCelebsByCompanyId(companyId, { page, limit });
-        setCelebs(response.list);
-        setTotalPages(response.pagination.total_pages);
+        const celebsResponse = await getCelebsByCompanyId(companyId, { page, limit });
+        setCelebs(celebsResponse.list);
+        setTotalPages(celebsResponse.pagination.total_pages);
+        setCompanyName(celebsResponse.company_name);
+
+        // CEO 게시글 가져오기
+        if (celebsResponse.ceo_id) {
+          const ceoPostsResponse = await getPostsByUserId(celebsResponse.ceo_id);
+          setCeoPosts(ceoPostsResponse.list);
+        }
+
+        checkFavoriteStatus();
+
       } catch (err) {
-        setError(err.message || '셀럽 목록을 불러오는데 실패했습니다.');
+        setError(err.message || '데이터를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
     };
 
     if (companyId) {
-      fetchCelebs();
-      checkFavoriteStatus();
+      fetchCompanyData();
     }
   }, [companyId, page, limit, userId, token]);
 
@@ -55,7 +68,7 @@ function CompanyDetailPage({ userId, token }) {
     try {
       await addFavorite({ company_id: parseInt(companyId, 10) }, token);
       alert('즐겨찾기에 추가되었습니다.');
-      checkFavoriteStatus(); // 상태 업데이트
+      checkFavoriteStatus();
     } catch (err) {
       alert(`즐겨찾기 추가 실패: ${err.message || '알 수 없는 오류'}`);
     }
@@ -66,7 +79,7 @@ function CompanyDetailPage({ userId, token }) {
     try {
       await removeFavorite(favoriteId, token);
       alert('즐겨찾기에서 삭제되었습니다.');
-      checkFavoriteStatus(); // 상태 업데이트
+      checkFavoriteStatus();
     } catch (err) {
       alert(`즐겨찾기 삭제 실패: ${err.message || '알 수 없는 오류'}`);
     }
@@ -80,17 +93,20 @@ function CompanyDetailPage({ userId, token }) {
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div>오류: {error}</div>;
+  if (!companyName) return <div>회사 정보를 찾을 수 없습니다.</div>;
 
   return (
     <div>
-      <h2>회사 ID: {companyId} 소속 셀럽 목록</h2>
-      {token && ( // 로그인 상태일 때만 버튼 표시
+      <h2>{companyName} 상세 정보</h2>
+      {token && (
         isFavorite ? (
           <button onClick={handleRemoveFavorite}>즐겨찾기 삭제</button>
         ) : (
           <button onClick={handleAddFavorite}>즐겨찾기 추가</button>
         )
       )}
+
+      <h3>소속 셀럽</h3>
       <ul>
         {celebs.map((celeb) => (
           <li key={celeb.celeb_id}>
@@ -105,6 +121,15 @@ function CompanyDetailPage({ userId, token }) {
         <span>페이지 {page} / {totalPages}</span>
         <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>다음</button>
       </div>
+
+      <h3>CEO 작성글</h3>
+      <ul>
+        {ceoPosts.map(post => (
+          <li key={post.post_id}>
+            <Link to={`/posts/${post.post_id}`}>{post.title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -66,7 +66,7 @@ function PostList() {
       <ul>
         {posts.map((post) => (
           <li key={post.post_id}>
-            <Link to={`/posts/${post.post_id}`}>{post.title}</Link> - {post.nickname} ({formatToKST(post.created_at)})
+            <Link to={`/posts/${post.post_id}`}>{post.title}</Link> - <Link to={`/users/${post.writer_id}`}>{post.nickname}</Link> ({formatToKST(post.created_at)})
           </li>
         ))}
       </ul>

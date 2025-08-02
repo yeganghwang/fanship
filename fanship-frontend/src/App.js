@@ -5,6 +5,7 @@ import './App.css';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import UserProfilePage from './pages/UserProfilePage';
+import PublicProfilePage from './pages/PublicProfilePage';
 import PasswordResetRequestPage from './pages/PasswordResetRequestPage';
 import PasswordResetConfirmPage from './pages/PasswordResetConfirmPage';
 import CompanyListPage from './pages/CompanyListPage';
@@ -15,6 +16,10 @@ import PostListPage from './pages/PostListPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostCreatePage from './pages/PostCreatePage';
 import PostEditPage from './pages/PostEditPage';
+import GoodsListPage from './pages/GoodsListPage';
+import GoodsDetailPage from './pages/GoodsDetailPage';
+import GoodsCreatePage from './pages/GoodsCreatePage';
+import GoodsEditPage from './pages/GoodsEditPage';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -65,6 +70,7 @@ function App() {
               <Link to="/companies">회사 목록</Link> |
               <Link to="/favorites">즐겨찾기</Link> |
               <Link to="/posts">게시판</Link> |
+              <Link to="/goods">굿즈</Link> |
               <button onClick={handleLogout}>로그아웃</button>
             </nav>
           ) : (
@@ -87,6 +93,7 @@ function App() {
                   />
                 } />
                 <Route path="/profile" element={<UserProfilePage userId={userId} token={token} />} />
+                <Route path="/users/:userId" element={<PublicProfilePage />} />
                 <Route path="/companies" element={<CompanyListPage />} />
                 <Route path="/companies/:companyId" element={<CompanyDetailPage userId={userId} token={token} />} />
                 <Route path="/celebs/:celebId" element={<CelebDetailPage userId={userId} token={token} />} />
@@ -95,6 +102,10 @@ function App() {
                 <Route path="/posts/create" element={<PostCreatePage token={token} />} />
                 <Route path="/posts/:postId" element={<PostDetailPage userId={userId} token={token} position={position} companyId={companyId} />} />
                 <Route path="/posts/:postId/edit" element={<PostEditPage token={token} />} />
+                <Route path="/goods" element={<GoodsListPage />} />
+                <Route path="/goods/create" element={<GoodsCreatePage token={token} />} />
+                <Route path="/goods/:goodsId" element={<GoodsDetailPage userId={userId} token={token} position={position} />} />
+                <Route path="/goods/:goodsId/edit" element={<GoodsEditPage token={token} />} />
                 <Route path="/*" element={<Navigate to="/" replace />} />
               </>
             ) : (

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPost, deletePost } from '../api/post';
 import { formatToKST } from '../utils/date';
+import CommentList from '../components/comment/CommentList';
+import CommentForm from '../components/comment/CommentForm';
 
 function PostDetailPage({ userId, token, position, companyId }) {
   const { postId } = useParams();
@@ -9,22 +11,23 @@ function PostDetailPage({ userId, token, position, companyId }) {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [comments, setComments] = useState([]);
+
+  const fetchPostAndComments = async () => {
+    setLoading(true);
+    try {
+      const postResponse = await getPost(postId);
+      setPost(postResponse);
+    } catch (err) {
+      setError(err.message || '게시글을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPost = async () => {
-      setLoading(true);
-      try {
-        const response = await getPost(postId);
-        setPost(response);
-      } catch (err) {
-        setError(err.message || '게시글을 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (postId) {
-      fetchPost();
+      fetchPostAndComments();
     }
   }, [postId]);
 
@@ -42,23 +45,15 @@ function PostDetailPage({ userId, token, position, companyId }) {
 
   const canEditOrDelete = () => {
     if (!post || !userId) return false;
-
-    // 관리자 또는 개발자는 모든 글 삭제 가능
-    if (position === 'manager' || position === 'developer') {
-      return true;
-    }
-
-    // 본인이 작성한 글은 수정/삭제 가능
-    if (post.writer_id === parseInt(userId, 10)) {
-      return true;
-    }
-
-    // CEO는 자기 회사 셀럽의 글 수정/삭제 가능
-    if (position === 'ceo' && post.writer_company_id === parseInt(companyId, 10)) {
-      return true;
-    }
-
+    if (position === 'manager' || position === 'developer') return true;
+    if (post.writer_id === parseInt(userId, 10)) return true;
+    if (position === 'ceo' && post.writer_company_id === parseInt(companyId, 10)) return true;
     return false;
+  };
+
+  const handleCommentCreated = (newComment) => {
+    setComments([newComment, ...comments]);
+    fetchPostAndComments(); // Refresh comments
   };
 
   if (loading) return <div>로딩 중...</div>;
@@ -79,6 +74,11 @@ function PostDetailPage({ userId, token, position, companyId }) {
           <button onClick={handleDelete}>삭제</button>
         </div>
       )}
+
+      <hr />
+
+      <CommentForm postId={postId} token={token} onCommentCreated={handleCommentCreated} />
+      <CommentList postId={postId} userId={userId} token={token} position={position} />
     </div>
   );
 }
