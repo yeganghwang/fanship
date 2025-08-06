@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { ListGroup, Pagination, Spinner, Alert, Nav } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import { getPosts } from '../../api/post';
 import { formatToKST } from '../../utils/date';
 
@@ -17,6 +18,7 @@ function PostList() {
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
+      setError(null);
       try {
         const params = { page, limit };
         if (activeTab === '공지') {
@@ -46,36 +48,54 @@ function PostList() {
     setActiveTab(tab);
   };
 
-  if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>오류: {error}</div>;
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    let items = [];
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Pagination.Item key={number} active={number === page} onClick={() => setPage(number)}>
+          {number}
+        </Pagination.Item>,
+      );
+    }
+    return <Pagination className="justify-content-center">{items}</Pagination>;
+  };
+
+  if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
-    <div>
-      <h2>게시글 목록</h2>
-      <div>
+    <>
+      <Nav variant="tabs" activeKey={activeTab} onSelect={handleTabChange} className="mb-3">
         {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => handleTabChange(tab)}
-            style={{ fontWeight: activeTab === tab ? 'bold' : 'normal' }}
-          >
-            {tab}
-          </button>
+          <Nav.Item key={tab}>
+            <Nav.Link eventKey={tab}>{tab}</Nav.Link>
+          </Nav.Item>
         ))}
+      </Nav>
+
+      <ListGroup>
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <LinkContainer to={`/posts/${post.post_id}`} key={post.post_id}>
+              <ListGroup.Item action>
+                <div className="d-flex w-100 justify-content-between">
+                  <h5 className="mb-1">{post.title}</h5>
+                  <small>{formatToKST(post.created_at)}</small>
+                </div>
+                <p className="mb-1">작성자: {post.nickname}</p>
+              </ListGroup.Item>
+            </LinkContainer>
+          ))
+        ) : (
+          <ListGroup.Item>게시글이 없습니다.</ListGroup.Item>
+        )}
+      </ListGroup>
+
+      <div className="d-flex justify-content-center mt-3">
+        {renderPagination()}
       </div>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.post_id}>
-            <Link to={`/posts/${post.post_id}`}>{post.title}</Link> - <Link to={`/users/${post.writer_id}`}>{post.nickname}</Link> ({formatToKST(post.created_at)})
-          </li>
-        ))}
-      </ul>
-      <div>
-        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>이전</button>
-        <span>페이지 {page} / {totalPages}</span>
-        <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>다음</button>
-      </div>
-    </div>
+    </>
   );
 }
 

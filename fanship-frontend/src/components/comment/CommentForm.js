@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
 import { createComment } from '../../api/comment';
 
 function CommentForm({ postId, token, onCommentCreated }) {
@@ -6,6 +7,7 @@ function CommentForm({ postId, token, onCommentCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!content.trim()) return;
     try {
       const newComment = await createComment(postId, content, token);
       onCommentCreated(newComment);
@@ -16,15 +18,23 @@ function CommentForm({ postId, token, onCommentCreated }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="댓글을 입력하세요"
-        required
-      />
-      <button type="submit">댓글 작성</button>
-    </form>
+    <Form onSubmit={handleSubmit} className="mt-4">
+      <Form.Group className="mb-3">
+        <Form.Control
+          as="textarea"
+          rows={3}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="댓글을 입력하세요"
+          required
+        />
+      </Form.Group>
+      <div className="text-end">
+        <Button variant="primary" type="submit" disabled={!content.trim()}>
+          댓글 작성
+        </Button>
+      </div>
+    </Form>
   );
 }
 
