@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { ListGroup, Pagination, Spinner, Alert, Nav, Form, Button, InputGroup } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import { getCompanyList } from '../../api/company';
 
 function CompanyList() {
@@ -17,11 +18,12 @@ function CompanyList() {
   const [searchTerm, setSearchTerm] = useState(''); // For the input field
   const [searchQuery, setSearchQuery] = useState(''); // For the actual API query
 
-  const regions = ['전체', '서울', '부산', '대구'];
+  const regions = ['전체', '서울', '부산', '대구']; // You can expand this list
 
   useEffect(() => {
     const fetchCompanies = async () => {
       setLoading(true);
+      setError(null);
       try {
         const params = { page, limit };
         if (region && region !== '전체') {
@@ -46,12 +48,6 @@ function CompanyList() {
     fetchCompanies();
   }, [page, limit, region, searchQuery]);
 
-  const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) {
-      setPage(newPage);
-    }
-  };
-
   const handleRegionChange = (newRegion) => {
     setPage(1);
     setRegion(newRegion === '전체' ? '' : newRegion);
@@ -63,59 +59,67 @@ function CompanyList() {
     setSearchQuery(searchTerm);
   };
 
-  if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>오류: {error}</div>;
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    let items = [];
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <Pagination.Item key={number} active={number === page} onClick={() => setPage(number)}>
+          {number}
+        </Pagination.Item>,
+      );
+    }
+    return <Pagination className="justify-content-center">{items}</Pagination>;
+  };
+
+  if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
-    <div>
-      <h2>회사 목록</h2>
-
+    <>
       {/* Region Tabs */}
-      <div>
+      <Nav variant="tabs" activeKey={region || '전체'} onSelect={handleRegionChange} className="mb-3">
         {regions.map((r) => (
-          <button
-            key={r}
-            onClick={() => handleRegionChange(r)}
-            style={{ fontWeight: (region === r || (r === '전체' && !region)) ? 'bold' : 'normal' }}
-          >
-            {r}
-          </button>
+          <Nav.Item key={r}>
+            <Nav.Link eventKey={r}>{r}</Nav.Link>
+          </Nav.Item>
         ))}
-      </div>
+      </Nav>
 
       {/* Search Form */}
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="회사 이름으로 검색"
-        />
-        <button type="submit">검색</button>
-      </form>
+      <Form onSubmit={handleSearch} className="mb-3">
+        <InputGroup>
+          <Form.Control
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="회사 이름으로 검색"
+          />
+          <Button variant="outline-secondary" type="submit">검색</Button>
+        </InputGroup>
+      </Form>
 
       {/* Company List */}
-      <ul>
+      <ListGroup>
         {companies.length > 0 ? (
           companies.map((company) => (
-            <li key={company.company_id}>
-              <Link to={`/companies/${company.company_id}`}>
-                {company.company_name}
-              </Link> ({company.company_type}, {company.region})
-            </li>
+            <LinkContainer to={`/companies/${company.company_id}`} key={company.company_id}>
+              <ListGroup.Item action>
+                <div className="fw-bold">{company.company_name}</div>
+                <small className="text-muted">{company.company_type} | {company.region}</small>
+              </ListGroup.Item>
+            </LinkContainer>
           ))
         ) : (
-          <p>결과가 없습니다.</p>
+          <ListGroup.Item>결과가 없습니다.</ListGroup.Item>
         )}
-      </ul>
+      </ListGroup>
 
       {/* Pagination */}
-      <div>
-        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>이전</button>
-        <span>페이지 {page} / {totalPages}</span>
-        <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>다음</button>
+      <div className="d-flex justify-content-center mt-3">
+        {renderPagination()}
       </div>
-    </div>
+    </>
   );
 }
 
