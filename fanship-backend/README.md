@@ -1,3 +1,23 @@
+# fanship-backend
+
+## 환경 변수
+원활한 실행을 위하여, `fanship-backend` 폴더 내에 `.env` 파일을 생성하여 환경변수를 설정하여야 합니다.
+아래와 같이 `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME`을 추가하고, `JWT_SECRET`, `JWT_EXPIRES_IN` 항목을 추가합니다.
+
+```bash
+DB_HOST = localhost
+DB_PORT = 3306
+DB_USERNAME = username
+DB_PASSWORD = password
+DB_NAME = fanship
+
+JWT_SECRET = secret
+JWT_EXPIRES_IN = 1h
+```
+
+
+---
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

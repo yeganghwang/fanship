@@ -5,10 +5,15 @@ import RegisterForm from '../components/auth/RegisterForm';
 function LoginPage({ onLoginSuccess }) {
   const [isRegistering, setIsRegistering] = useState(false);
 
+  // 회원가입 성공 시 로그인 폼으로 전환
+  const handleRegisterSuccess = () => {
+    setIsRegistering(false);
+  };
+
   return (
     <div>
       {isRegistering ? (
-        <RegisterForm />
+        <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
       ) : (
         <LoginForm onLoginSuccess={onLoginSuccess} />
       )}

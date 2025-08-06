@@ -1,3 +1,14 @@
+# fanship-frontend
+
+## 환경변수
+
+환경변수를 설정하여 백엔드 경로를 지정할 수 있습니다.
+`fanship-frontend` 폴더 내에 `.env` 파일을 생성하여, 아래 내용을 추가하세요.
+```bash
+REACT_APP_API_BASE_URL=http://localhost:3000/api
+```
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -17,3 +17,25 @@
 # 서버 - 클라이언트 환경
 - 서버 : NestJS
 - 클라이언트 : React
+
+# 환경변수
+
+## fanship-backend
+`.env` 파일을 `fanship-backend` 폴더 내에 생성하고 Database와 JWT 설정 내용을 적습니다.
+```bash
+DB_HOST = 
+DB_PORT = 
+DB_USERNAME = 
+DB_PASSWORD = 
+DB_NAME = 
+
+JWT_SECRET = 
+JWT_EXPIRES_IN = 
+```
+
+
+## fanship-frontend
+`.env` 파일을 `fanship-frontend` 폴더 내에 생성하고 Backend 서버의 경로를 적습니다.
+```bash
+REACT_APP_API_BASE_URL=http://localhost:3000/api
+```

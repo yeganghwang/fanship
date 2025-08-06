@@ -60,7 +60,10 @@ function RegisterForm({ onRegisterSuccess }) {
       const userData = { username, password, mail, nickname, position };
       const data = await register(userData);
       setMessage(`회원가입 성공: ${data.username}`);
-      // onRegisterSuccess(data); // Optionally, you can pass data to the parent component
+      alert('회원가입이 성공적으로 완료되었습니다!');
+      if (onRegisterSuccess) {
+        onRegisterSuccess();
+      }
     } catch (error) {
       setMessage(`회원가입 실패: ${error.message || '알 수 없는 오류'}`);
     }
