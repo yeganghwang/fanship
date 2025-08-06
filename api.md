@@ -881,9 +881,11 @@
 - **GET** `/api/goods`
 - Query: 
   - `seller_id` (Number, Optional): 특정 판매자의 굿즈만 조회 (생략 시 모든 판매자의 굿즈 반환)
+  - `seller_nickname` (String, Optional): 특정 닉네임의 판매자의 굿즈만 조회 (생략 시 모든 판매자의 굿즈 반환)
   - `page` (Number, Optional): 페이지 번호 (기본값: 1)
   - `limit` (Number, Optional): 페이지당 항목 수 (기본값: 20, 최대값: 100)
 - 인증 불필요
+- 제약 : `seller_id`와 `seller_nickname`은 모두 생략할 수 있고, 둘 중 하나만 받을 수 있음.
 - Response: 200 OK + 굿즈 배열
 ```json
 {
