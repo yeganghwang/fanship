@@ -14,7 +14,8 @@ function GoodsForm({ onSubmit, initialData = {}, isEdit = false }) {
     setPrice(initialData.price || 0);
     setAmount(initialData.amount || 0);
     setNotice(initialData.notice || false);
-  }, [initialData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 빈 배열로 변경: 최초 마운트 시에만 실행
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -11,7 +11,8 @@ function GoodsList() {
   const [limit, setLimit] = useState(12); // Card layout might look better with fewer items per row
   const [totalPages, setTotalPages] = useState(1);
   const [sellerId, setSellerId] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [sellerNickname, setSellerNickname] = useState('');
+  const [searchTerm, setSearchTerm] = useState({ sellerId: '', sellerNickname: '' });
 
   useEffect(() => {
     const fetchGoods = async () => {
@@ -19,8 +20,11 @@ function GoodsList() {
       setError(null);
       try {
         const params = { page, limit };
-        if (searchTerm) {
-          params.seller_id = searchTerm;
+        if (searchTerm.sellerId) {
+          params.seller_id = searchTerm.sellerId;
+        }
+        if (searchTerm.sellerNickname) {
+          params.seller_nickname = searchTerm.sellerNickname;
         }
         const response = await getGoodsList(params);
         setGoods(response.list);
@@ -38,7 +42,7 @@ function GoodsList() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    setSearchTerm(sellerId);
+    setSearchTerm({ sellerId, sellerNickname });
   };
 
   const renderPagination = () => {
@@ -61,11 +65,17 @@ function GoodsList() {
     <>
       <Form onSubmit={handleSearch} className="mb-4">
         <InputGroup>
-          <Form.Control
+          {/* <Form.Control
             type="text"
             value={sellerId}
             onChange={(e) => setSellerId(e.target.value)}
             placeholder="판매자 ID로 필터링"
+          /> */}
+          <Form.Control
+            type="text"
+            value={sellerNickname}
+            onChange={(e) => setSellerNickname(e.target.value)}
+            placeholder="판매자 닉네임으로 필터링"
           />
           <Button variant="outline-secondary" type="submit">검색</Button>
         </InputGroup>
@@ -84,6 +94,8 @@ function GoodsList() {
                     <strong>가격:</strong> {item.price.toLocaleString()}원
                     <br />
                     <strong>남은 수량:</strong> {item.amount}
+                    <br />
+                    <strong>판매자:</strong> {item.seller_nickname}
                   </Card.Text>
                   <LinkContainer to={`/goods/${item.goods_id}`}>
                     <Button variant="primary">상세보기</Button>
