@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
 import { logout } from './api/auth';
 import './App.css';
+
+// Layout
+import Header from './components/layout/Header';
+
+// Pages
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import UserProfilePage from './pages/UserProfilePage';
@@ -47,6 +53,9 @@ function App() {
   const handleLogout = async () => {
     try {
       await logout(token);
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
       setToken('');
       setUserId('');
       setCompanyId('');
@@ -54,71 +63,52 @@ function App() {
       setCeoId('');
       setPosition('');
       localStorage.clear();
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
     }
   };
 
   return (
     <Router>
-      <div className="App">
-        <header className="App-header">
+      <Header onLogout={handleLogout} userId={userId} />
+      <Container className="mt-4">
+        <Routes>
           {token ? (
-            <nav>
-              <Link to="/">홈</Link> |
-              <Link to="/profile">내 프로필</Link> |
-              <Link to="/companies">회사 목록</Link> |
-              <Link to="/favorites">즐겨찾기</Link> |
-              <Link to="/posts">게시판</Link> |
-              <Link to="/goods">굿즈</Link> |
-              <button onClick={handleLogout}>로그아웃</button>
-            </nav>
+            <>
+              <Route path="/" element={
+                <HomePage
+                  userId={userId}
+                  position={position}
+                  companyId={companyId}
+                  celebId={celebId}
+                  ceoId={ceoId}
+                  onLogout={handleLogout}
+                />
+              } />
+              <Route path="/profile" element={<UserProfilePage userId={userId} token={token} />} />
+              <Route path="/users/:userId" element={<PublicProfilePage />} />
+              <Route path="/companies" element={<CompanyListPage />} />
+              <Route path="/companies/:companyId" element={<CompanyDetailPage userId={userId} token={token} />} />
+              <Route path="/celebs/:celebId" element={<CelebDetailPage userId={userId} token={token} />} />
+              <Route path="/favorites" element={<FavoriteListPage userId={userId} token={token} />} />
+              <Route path="/posts" element={<PostListPage />} />
+              <Route path="/posts/create" element={<PostCreatePage token={token} />} />
+              <Route path="/posts/:postId" element={<PostDetailPage userId={userId} token={token} position={position} companyId={companyId} />} />
+              <Route path="/posts/:postId/edit" element={<PostEditPage token={token} />} />
+              <Route path="/goods" element={<GoodsListPage />} />
+              <Route path="/goods/create" element={<GoodsCreatePage token={token} />} />
+              <Route path="/goods/:goodsId" element={<GoodsDetailPage userId={userId} token={token} position={position} />} />
+              <Route path="/goods/:goodsId/edit" element={<GoodsEditPage token={token} />} />
+              <Route path="/*" element={<Navigate to="/" replace />} />
+            </>
           ) : (
-            <nav>
-              <Link to="/">로그인</Link> |
-              <Link to="/password-reset-request">비밀번호 재설정</Link>
-            </nav>
+            <>
+              <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
+              <Route path="/password-reset-request" element={<PasswordResetRequestPage />} />
+              <Route path="/password-reset-confirm" element={<PasswordResetConfirmPage />} />
+              <Route path="/*" element={<Navigate to="/login" replace />} />
+            </>
           )}
-          <Routes>
-            {token ? (
-              <>
-                <Route path="/" element={
-                  <HomePage
-                    userId={userId}
-                    position={position}
-                    companyId={companyId}
-                    celebId={celebId}
-                    ceoId={ceoId}
-                    onLogout={handleLogout}
-                  />
-                } />
-                <Route path="/profile" element={<UserProfilePage userId={userId} token={token} />} />
-                <Route path="/users/:userId" element={<PublicProfilePage />} />
-                <Route path="/companies" element={<CompanyListPage />} />
-                <Route path="/companies/:companyId" element={<CompanyDetailPage userId={userId} token={token} />} />
-                <Route path="/celebs/:celebId" element={<CelebDetailPage userId={userId} token={token} />} />
-                <Route path="/favorites" element={<FavoriteListPage userId={userId} token={token} />} />
-                <Route path="/posts" element={<PostListPage />} />
-                <Route path="/posts/create" element={<PostCreatePage token={token} />} />
-                <Route path="/posts/:postId" element={<PostDetailPage userId={userId} token={token} position={position} companyId={companyId} />} />
-                <Route path="/posts/:postId/edit" element={<PostEditPage token={token} />} />
-                <Route path="/goods" element={<GoodsListPage />} />
-                <Route path="/goods/create" element={<GoodsCreatePage token={token} />} />
-                <Route path="/goods/:goodsId" element={<GoodsDetailPage userId={userId} token={token} position={position} />} />
-                <Route path="/goods/:goodsId/edit" element={<GoodsEditPage token={token} />} />
-                <Route path="/*" element={<Navigate to="/" replace />} />
-              </>
-            ) : (
-              <>
-                <Route path="/" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
-                <Route path="/password-reset-request" element={<PasswordResetRequestPage />} />
-                <Route path="/password-reset-confirm" element={<PasswordResetConfirmPage />} />
-                <Route path="/*" element={<Navigate to="/" replace />} />
-              </>
-            )}
-          </Routes>
-        </header>
-      </div>
+        </Routes>
+      </Container>
     </Router>
   );
 }
