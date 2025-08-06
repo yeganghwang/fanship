@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { Card, Button, Spinner, Alert, ListGroup, Row, Col, Image } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import { getCelebDetail } from '../api/celeb';
 import { addFavorite, removeFavorite, getFavorites } from '../api/favorite';
 import { getPostsByUserId } from '../api/post';
@@ -33,6 +35,7 @@ function CelebDetailPage({ userId, token }) {
   useEffect(() => {
     const fetchCelebData = async () => {
       setLoading(true);
+      setError(null);
       try {
         const celebResponse = await getCelebDetail(celebId);
         setCelebDetail(celebResponse);
@@ -42,7 +45,9 @@ function CelebDetailPage({ userId, token }) {
           setPosts(postsResponse.list);
         }
 
-        checkFavoriteStatus();
+        if (userId && token) {
+          await checkFavoriteStatus();
+        }
 
       } catch (err) {
         setError(err.message || '데이터를 불러오는데 실패했습니다.');
@@ -56,56 +61,77 @@ function CelebDetailPage({ userId, token }) {
     }
   }, [celebId, userId, token]);
 
-  const handleAddFavorite = async () => {
+  const handleFavoriteToggle = async () => {
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
     try {
-      await addFavorite({ celeb_id: parseInt(celebId, 10) }, token);
-      alert('즐겨찾기에 추가되었습니다.');
-      checkFavoriteStatus();
+      if (isFavorite) {
+        await removeFavorite(favoriteId, token);
+        alert('즐겨찾기에서 삭제되었습니다.');
+      } else {
+        await addFavorite({ celeb_id: parseInt(celebId, 10) }, token);
+        alert('즐겨찾기에 추가되었습니다.');
+      }
+      await checkFavoriteStatus();
     } catch (err) {
-      alert(`즐겨찾기 추가 실패: ${err.message || '알 수 없는 오류'}`);
+      alert(`작업 실패: ${err.message || '알 수 없는 오류'}`);
     }
   };
 
-  const handleRemoveFavorite = async () => {
-    if (!favoriteId) return;
-    try {
-      await removeFavorite(favoriteId, token);
-      alert('즐겨찾기에서 삭제되었습니다.');
-      checkFavoriteStatus();
-    } catch (err) {
-      alert(`즐겨찾기 삭제 실패: ${err.message || '알 수 없는 오류'}`);
-    }
-  };
-
-  if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>오류: {error}</div>;
-  if (!celebDetail) return <div>셀럽 정보를 찾을 수 없습니다.</div>;
+  if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (!celebDetail) return <Alert variant="warning">셀럽 정보를 찾을 수 없습니다.</Alert>;
 
   return (
-    <div>
-      <h2>{celebDetail.nickname} 상세 정보</h2>
-      {token && (
-        isFavorite ? (
-          <button onClick={handleRemoveFavorite}>즐겨찾기 삭제</button>
-        ) : (
-          <button onClick={handleAddFavorite}>즐겨찾기 추가</button>
-        )
-      )}
-      <p>유형: {celebDetail.celeb_type}</p>
-      <p>소속 회사: {celebDetail.company_name}</p>
-      {celebDetail.ig_url && <p>인스타그램: <a href={celebDetail.ig_url} target="_blank" rel="noopener noreferrer">{celebDetail.ig_url}</a></p>}
-      {celebDetail.pfp_img_url && <p>프로필 이미지: <img src={celebDetail.pfp_img_url} alt="프로필" style={{ width: '100px', height: '100px' }} /></p>}
-      {celebDetail.dob && <p>생년월일: {celebDetail.dob}</p>}
+    <>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1>{celebDetail.nickname}</h1>
+        {token && (
+          <Button variant={isFavorite ? "outline-danger" : "outline-primary"} onClick={handleFavoriteToggle}>
+            {isFavorite ? '★ 즐겨찾기 해제' : '☆ 즐겨찾기 추가'}
+          </Button>
+        )}
+      </div>
 
-      <h3>작성한 게시글</h3>
-      <ul>
-        {posts.map(post => (
-          <li key={post.post_id}>
-            <Link to={`/posts/${post.post_id}`}>{post.title}</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+      <Row>
+        <Col md={4}>
+          <Card className="mb-3">
+            {celebDetail.pfp_img_url && <Card.Img variant="top" src={celebDetail.pfp_img_url} />}
+            <Card.Body>
+              <Card.Title>{celebDetail.nickname}</Card.Title>
+              <Card.Subtitle className="mb-2 text-muted">{celebDetail.celeb_type}</Card.Subtitle>
+              <ListGroup variant="flush">
+                <ListGroup.Item>소속: {celebDetail.company_name || '없음'}</ListGroup.Item>
+                {celebDetail.dob && <ListGroup.Item>생년월일: {celebDetail.dob}</ListGroup.Item>}
+                {celebDetail.ig_url && 
+                  <ListGroup.Item>
+                    인스타그램: <a href={celebDetail.ig_url} target="_blank" rel="noopener noreferrer">바로가기</a>
+                  </ListGroup.Item>
+                }
+              </ListGroup>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={8}>
+          <Card>
+            <Card.Header as="h5">작성한 게시글</Card.Header>
+            <ListGroup variant="flush">
+              {posts.length > 0 ? (
+                posts.map(post => (
+                  <LinkContainer to={`/posts/${post.post_id}`} key={post.post_id}>
+                    <ListGroup.Item action>{post.title}</ListGroup.Item>
+                  </LinkContainer>
+                ))
+              ) : (
+                <ListGroup.Item>작성한 게시글이 없습니다.</ListGroup.Item>
+              )}
+            </ListGroup>
+          </Card>
+        </Col>
+      </Row>
+    </>
   );
 }
 
