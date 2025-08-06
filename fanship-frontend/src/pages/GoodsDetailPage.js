@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Card, Button, Spinner, Alert, ButtonGroup } from 'react-bootstrap';
 import { getGoods, deleteGoods } from '../api/goods';
 
 function GoodsDetailPage({ userId, token, position }) {
@@ -12,6 +13,7 @@ function GoodsDetailPage({ userId, token, position }) {
   useEffect(() => {
     const fetchGoods = async () => {
       setLoading(true);
+      setError(null);
       try {
         const response = await getGoods(goodsId);
         setGoods(response);
@@ -45,25 +47,33 @@ function GoodsDetailPage({ userId, token, position }) {
     return goods.seller_id === parseInt(userId, 10);
   };
 
-  if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>오류: {error}</div>;
-  if (!goods) return <div>굿즈 정보를 찾을 수 없습니다.</div>;
+  if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (!goods) return <Alert variant="warning">굿즈 정보를 찾을 수 없습니다.</Alert>;
 
   return (
-    <div>
-      <h2>{goods.title}</h2>
-      <p>판매자: {goods.seller_nickname}</p>
-      <p>가격: {goods.price}원</p>
-      <p>수량: {goods.amount}</p>
-      <div dangerouslySetInnerHTML={{ __html: goods.content }} />
-
+    <Card>
+      <Card.Header>
+        <Card.Title as="h2">{goods.title}</Card.Title>
+        <Card.Subtitle className="text-muted">판매자: {goods.seller_nickname}</Card.Subtitle>
+      </Card.Header>
+      <Card.Body>
+        <Card.Text as="div">
+          <p><strong>가격:</strong> {goods.price.toLocaleString()}원</p>
+          <p><strong>남은 수량:</strong> {goods.amount}</p>
+          <hr />
+          <div dangerouslySetInnerHTML={{ __html: goods.content }} />
+        </Card.Text>
+      </Card.Body>
       {canEditOrDelete() && (
-        <div>
-          <button onClick={() => navigate(`/goods/${goodsId}/edit`)}>수정</button>
-          <button onClick={handleDelete}>삭제</button>
-        </div>
+        <Card.Footer className="text-end">
+          <ButtonGroup>
+            <Button variant="outline-secondary" onClick={() => navigate(`/goods/${goodsId}/edit`)}>수정</Button>
+            <Button variant="outline-danger" onClick={handleDelete}>삭제</Button>
+          </ButtonGroup>
+        </Card.Footer>
       )}
-    </div>
+    </Card>
   );
 }
 

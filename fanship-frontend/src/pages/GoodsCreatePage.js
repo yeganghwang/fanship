@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card } from 'react-bootstrap';
 import { createGoods } from '../api/goods';
 import GoodsForm from '../components/goods/GoodsForm';
 
@@ -17,10 +18,14 @@ function GoodsCreatePage({ token }) {
   };
 
   return (
-    <div>
-      <h1>새 굿즈 등록</h1>
-      <GoodsForm onSubmit={handleSubmit} />
-    </div>
+    <>
+      <h1 className="mb-4">새 굿즈 등록</h1>
+      <Card>
+        <Card.Body>
+          <GoodsForm onSubmit={handleSubmit} />
+        </Card.Body>
+      </Card>
+    </>
   );
 }
 
