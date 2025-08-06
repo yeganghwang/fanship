@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { login } from '../../api/auth';
 
 function LoginForm({ onLoginSuccess }) {
@@ -18,40 +19,40 @@ function LoginForm({ onLoginSuccess }) {
   };
 
   return (
-    <Card className="w-100" style={{ maxWidth: '400px', margin: 'auto' }}>
-      <Card.Body>
-        <Card.Title as="h2" className="text-center mb-4">로그인</Card.Title>
-        <Form onSubmit={handleLogin}>
-          <Form.Group className="mb-3" controlId="formBasicUsername">
-            <Form.Label>사용자 이름</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="사용자 이름을 입력하세요"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </Form.Group>
+    <>
+      <Form onSubmit={handleLogin}>
+        <Form.Group className="mb-3" controlId="formBasicUsername">
+          <Form.Label>사용자 이름</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="사용자 이름을 입력하세요"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </Form.Group>
 
-          <Form.Group className="mb-3" controlId="formBasicPassword">
-            <Form.Label>비밀번호</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="비밀번호를 입력하세요"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </Form.Group>
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Label>비밀번호</Form.Label>
+          <Form.Control
+            type="password"
+            placeholder="비밀번호를 입력하세요"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </Form.Group>
 
-          <Button variant="primary" type="submit" className="w-100">
-            로그인
-          </Button>
+        <Button variant="primary" type="submit" className="w-100">
+          로그인
+        </Button>
 
-          {message && <Alert variant="danger" className="mt-3">{message}</Alert>}
-        </Form>
-      </Card.Body>
-    </Card>
+        {message && <Alert variant="danger" className="mt-3">{message}</Alert>}
+      </Form>
+      <div className="mt-3 text-center">
+        <Link to="/password-reset-request">비밀번호를 잊으셨나요?</Link>
+      </div>
+    </>
   );
 }
 
