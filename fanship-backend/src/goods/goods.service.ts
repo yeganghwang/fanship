@@ -36,7 +36,7 @@ export class GoodsService {
     };
   }
 
-  async findAll(sellerId?: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
+  async findAll(sellerId?: number, sellerNickname?: string, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const query = this.goodsRepository
       .createQueryBuilder('goods')
       .leftJoinAndSelect('goods.seller', 'user')
@@ -44,6 +44,10 @@ export class GoodsService {
 
     if (sellerId !== undefined) {
       query.andWhere('goods.sellerId = :sellerId', { sellerId });
+    }
+
+    if (sellerNickname !== undefined) {
+      query.andWhere('goods.sellerNickname = :sellerNickname', { sellerNickname });
     }
 
     // 총 개수 조회
@@ -57,6 +61,8 @@ export class GoodsService {
 
     const list = goods.map(item => ({
       goods_id: item.id,
+      seller_nickname: item.seller.nickname,
+      seller_id: item.seller.userId,
       title: item.title,
       price: Number(item.price),
       amount: item.amount,

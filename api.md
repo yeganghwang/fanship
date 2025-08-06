@@ -890,6 +890,8 @@
   "list": [
     {
       "goods_id": 7,
+      "seller_nickname": "김셀럽",
+      "seller_id": 12,
       "title": "셀럽 포토북",
       "price": 19900.000,
       "amount": 100,
@@ -897,6 +899,8 @@
     },
     {
       "goods_id": 8,
+      "seller_nickname": "김셀럽",
+      "seller_id": 12,
       "title": "포토카드 케이스",
       "price": 49900.000,
       "amount": 10,

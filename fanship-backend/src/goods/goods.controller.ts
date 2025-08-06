@@ -21,10 +21,11 @@ export class GoodsController {
   @Get()
   async findAll(
     @Query('seller_id') sellerId?: number,
+    @Query('seller_nickname') sellerNickname?: string,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ): Promise<PaginatedResult<any>> {
-    return this.goodsService.findAll(sellerId, page, limit);
+    return this.goodsService.findAll(sellerId, sellerNickname, page, limit);
   }
 
   @Get(':goodsId')
