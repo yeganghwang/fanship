@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Form, Button, Card, Alert, Row, Col } from 'react-bootstrap';
 import { register } from '../../api/auth';
 
 function RegisterForm({ onRegisterSuccess }) {
@@ -15,32 +16,16 @@ function RegisterForm({ onRegisterSuccess }) {
   const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
-
-    // 비밀번호 길이 검사 (최소 8자)
-    if (value.length > 0 && value.length < 8) {
-      setPasswordLengthError(true);
-    } else {
-      setPasswordLengthError(false);
-    }
-
-    // 비밀번호 일치 검사
-    if (confirmPassword && value !== confirmPassword) {
-      setPasswordMatchError(true);
-    } else {
-      setPasswordMatchError(false);
+    setPasswordLengthError(value.length > 0 && value.length < 8);
+    if (confirmPassword) {
+      setPasswordMatchError(value !== confirmPassword);
     }
   };
 
   const handleConfirmPasswordChange = (e) => {
     const value = e.target.value;
     setConfirmPassword(value);
-
-    // 비밀번호 일치 검사
-    if (password && value !== password) {
-      setPasswordMatchError(true);
-    } else {
-      setPasswordMatchError(false);
-    }
+    setPasswordMatchError(password !== value);
   };
 
   const handleRegister = async (e) => {
@@ -59,8 +44,8 @@ function RegisterForm({ onRegisterSuccess }) {
     try {
       const userData = { username, password, mail, nickname, position };
       const data = await register(userData);
-      setMessage(`회원가입 성공: ${data.username}`);
-      alert('회원가입이 성공적으로 완료되었습니다!');
+      setMessage('');
+      alert(`회원가입 성공: ${data.username}님, 환영합니다!`);
       if (onRegisterSuccess) {
         onRegisterSuccess();
       }
@@ -72,70 +57,94 @@ function RegisterForm({ onRegisterSuccess }) {
   const isSubmitDisabled = !username || !password || !confirmPassword || !mail || !nickname || passwordMatchError || passwordLengthError;
 
   return (
-    <form onSubmit={handleRegister}>
-      <h2>회원가입</h2>
-      <div>
-        <label>사용자 이름:</label>
-        <input
-          type="text"
-          placeholder="사용자 이름"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>비밀번호:</label>
-        <input
-          type="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={handlePasswordChange}
-          required
-        />
-        {passwordLengthError && <p style={{ color: 'red' }}>비밀번호는 최소 8자 이상이어야 합니다.</p>}
-      </div>
-      <div>
-        <label>비밀번호 확인:</label>
-        <input
-          type="password"
-          placeholder="비밀번호 확인"
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          required
-        />
-        {passwordMatchError && <p style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</p>}
-      </div>
-      <div>
-        <label>이메일:</label>
-        <input
-          type="email"
-          placeholder="이메일"
-          value={mail}
-          onChange={(e) => setMail(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>닉네임:</label>
-        <input
-          type="text"
-          placeholder="닉네임"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>사용자 유형:</label>
-        <select value={position} onChange={(e) => setPosition(e.target.value)}>
-          <option value="fan">fan</option>
-          <option value="celeb">celeb</option>
-        </select>
-      </div>
-      <button type="submit" disabled={isSubmitDisabled}>회원가입</button>
-      <p>{message}</p>
-    </form>
+    <Card className="w-100" style={{ maxWidth: '500px', margin: 'auto' }}>
+      <Card.Body>
+        <Card.Title as="h2" className="text-center mb-4">회원가입</Card.Title>
+        <Form onSubmit={handleRegister}>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="formRegisterUsername">
+                <Form.Label>사용자 이름</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="사용자 이름"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3" controlId="formRegisterNickname">
+                <Form.Label>닉네임</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="닉네임"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Form.Group className="mb-3" controlId="formRegisterEmail">
+            <Form.Label>이메일</Form.Label>
+            <Form.Control
+              type="email"
+              placeholder="이메일"
+              value={mail}
+              onChange={(e) => setMail(e.target.value)}
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="formRegisterPassword">
+            <Form.Label>비밀번호</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="비밀번호"
+              value={password}
+              onChange={handlePasswordChange}
+              isInvalid={passwordLengthError}
+              required
+            />
+            <Form.Control.Feedback type="invalid">
+              비밀번호는 최소 8자 이상이어야 합니다.
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="formRegisterConfirmPassword">
+            <Form.Label>비밀번호 확인</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="비밀번호 확인"
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
+              isInvalid={passwordMatchError}
+              required
+            />
+            <Form.Control.Feedback type="invalid">
+              비밀번호가 일치하지 않습니다.
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="formRegisterPosition">
+            <Form.Label>사용자 유형</Form.Label>
+            <Form.Select value={position} onChange={(e) => setPosition(e.target.value)}>
+              <option value="fan">팬</option>
+              <option value="celeb">셀럽</option>
+            </Form.Select>
+          </Form.Group>
+
+          <Button variant="primary" type="submit" className="w-100" disabled={isSubmitDisabled}>
+            회원가입
+          </Button>
+
+          {message && <Alert variant="danger" className="mt-3">{message}</Alert>}
+        </Form>
+      </Card.Body>
+    </Card>
   );
 }
 

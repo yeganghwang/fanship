@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
+import { Tabs, Tab, Card } from 'react-bootstrap';
 import LoginForm from '../components/auth/LoginForm';
 import RegisterForm from '../components/auth/RegisterForm';
 
 function LoginPage({ onLoginSuccess }) {
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [key, setKey] = useState('login');
 
-  // 회원가입 성공 시 로그인 폼으로 전환
   const handleRegisterSuccess = () => {
-    setIsRegistering(false);
+    setKey('login'); // 회원가입 성공 시 로그인 탭으로 전환
   };
 
   return (
-    <div>
-      {isRegistering ? (
-        <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
-      ) : (
-        <LoginForm onLoginSuccess={onLoginSuccess} />
-      )}
-      <button type="button" onClick={() => setIsRegistering(!isRegistering)}>
-        {isRegistering ? '로그인으로 돌아가기' : '회원가입'}
-      </button>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh' }}>
+      <Card style={{ width: '100%', maxWidth: '500px' }}>
+        <Card.Body>
+          <Tabs
+            id="login-register-tabs"
+            activeKey={key}
+            onSelect={(k) => setKey(k)}
+            className="mb-3"
+            justify
+          >
+            <Tab eventKey="login" title="로그인">
+              <LoginForm onLoginSuccess={onLoginSuccess} />
+            </Tab>
+            <Tab eventKey="register" title="회원가입">
+              <RegisterForm onRegisterSuccess={handleRegisterSuccess} />
+            </Tab>
+          </Tabs>
+        </Card.Body>
+      </Card>
     </div>
   );
 }
