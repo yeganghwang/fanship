@@ -3,10 +3,10 @@ import FavoriteList from '../components/favorite/FavoriteList';
 
 function FavoriteListPage({ userId, token }) {
   return (
-    <div>
-      <h1>즐겨찾기 목록 페이지</h1>
+    <>
+      <h1 className="mb-4">즐겨찾기 목록</h1>
       <FavoriteList userId={userId} token={token} />
-    </div>
+    </>
   );
 }
 

@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 function Header({ onLogout, userId }) {
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+    <Navbar bg="dark" variant="dark" collapseOnSelect expand="lg">
       <Container>
         <LinkContainer to="/">
           <Navbar.Brand>Fanship</Navbar.Brand>
