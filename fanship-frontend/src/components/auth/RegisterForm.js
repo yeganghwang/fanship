@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Form, Button, Card, Alert, Row, Col } from 'react-bootstrap';
 import { register } from '../../api/auth';
+import { getCompanyList } from '../../api/company';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 function RegisterForm({ onRegisterSuccess }) {
@@ -11,9 +12,27 @@ function RegisterForm({ onRegisterSuccess }) {
   const [nickname, setNickname] = useState('');
   const recaptchaRef = useRef(null);
   const [position, setPosition] = useState('fan');
+  const [companyId, setCompanyId] = useState('');
+  const [celebType, setCelebType] = useState('메이드');
+  const [companies, setCompanies] = useState([]);
   const [message, setMessage] = useState('');
   const [passwordMatchError, setPasswordMatchError] = useState(false);
   const [passwordLengthError, setPasswordLengthError] = useState(false);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await getCompanyList({ limit: 100 }); // 모든 회사 목록을 가져옵니다.
+        setCompanies(response.list);
+      } catch (error) {
+        console.error('회사 목록을 불러오는데 실패했습니다.', error);
+      }
+    };
+
+    if (position === 'celeb') {
+      fetchCompanies();
+    }
+  }, [position]);
 
   const handlePasswordChange = (e) => {
     const value = e.target.value;
@@ -57,6 +76,10 @@ function RegisterForm({ onRegisterSuccess }) {
         position,
         recaptchaToken 
       };
+      if (position === 'celeb') {
+        userData.company_id = companyId;
+        userData.celeb_type = celebType;
+      }
       const data = await register(userData);
       setMessage('');
       alert(`회원가입 성공: ${data.username}님, 환영합니다!`);
@@ -69,7 +92,7 @@ function RegisterForm({ onRegisterSuccess }) {
     }
   };
 
-  const isSubmitDisabled = !username || !password || !confirmPassword || !mail || !nickname || passwordMatchError || passwordLengthError;
+  const isSubmitDisabled = !username || !password || !confirmPassword || !mail || !nickname || passwordMatchError || passwordLengthError || (position === 'celeb' && !companyId);
 
   return (
     <Card className="w-100" style={{ maxWidth: '500px', margin: 'auto' }}>
@@ -150,7 +173,34 @@ function RegisterForm({ onRegisterSuccess }) {
               <option value="fan">팬</option>
               <option value="celeb">셀럽</option>
             </Form.Select>
+            <Form.Text className="text-muted">
+              팬은 콘텐츠 소비자, 셀럽은 콘텐츠 제작자를 의미합니다.<br />사장님은 개발자가 직접 계정을 만들어 드립니다.
+            </Form.Text>
           </Form.Group>
+
+          {position === 'celeb' && (
+            <>
+              <Form.Group className="mb-3" controlId="formRegisterCompany">
+                <Form.Label>소속 회사</Form.Label>
+                <Form.Select value={companyId} onChange={(e) => setCompanyId(e.target.value)} required>
+                  <option value="">회사를 선택하세요</option>
+                  {companies.map(company => (
+                    <option key={company.company_id} value={company.company_id}>
+                      {company.company_name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              <Form.Group className="mb-3" controlId="formRegisterCelebType">
+                <Form.Label>셀럽 유형</Form.Label>
+                <Form.Select value={celebType} onChange={(e) => setCelebType(e.target.value)}>
+                  <option value="메이드">메이드</option>
+                  <option value="집사">집사</option>
+                </Form.Select>
+              </Form.Group>
+            </>
+          )}
 
           <div className="mb-3">
             <ReCAPTCHA
