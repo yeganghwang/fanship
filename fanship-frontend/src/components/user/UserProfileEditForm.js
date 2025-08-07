@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { updateUserProfile } from '../../api/user';
+import { uploadImage } from '../../api/upload';
 
 function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
   const [nickname, setNickname] = useState(initialData.nickname || '');
   const [pfpImgUrl, setPfpImgUrl] = useState(initialData.pfp_img_url || '');
   const [igUrl, setIgUrl] = useState(initialData.ig_url || '');
   const [message, setMessage] = useState('');
+  const [uploadStatus, setUploadStatus] = useState('idle'); // idle | uploading | success | error
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     setNickname(initialData.nickname || '');
@@ -17,6 +20,7 @@ function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    if (uploadStatus === 'uploading') return;
     try {
       const updateData = {
         nickname,
@@ -27,6 +31,22 @@ function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
       onUpdateSuccess(data); // Let parent component handle success message
     } catch (error) {
       setMessage(`프로필 업데이트 실패: ${error.message || '알 수 없는 오류'}`);
+    }
+  };
+
+  // 이미지 파일 업로드 핸들러
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadStatus('uploading');
+    setUploadError('');
+    try {
+      const url = await uploadImage(file, token);
+      setPfpImgUrl(url);
+      setUploadStatus('success');
+    } catch (err) {
+      setUploadStatus('error');
+      setUploadError('이미지 업로드 실패: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -42,14 +62,26 @@ function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
         />
       </Form.Group>
 
-      <Form.Group className="mb-3" controlId="formPfpUrl">
-        <Form.Label>프로필 이미지 URL</Form.Label>
+      <Form.Group className="mb-3" controlId="formPfpUpload">
+        <Form.Label>프로필 이미지 업로드</Form.Label>
         <Form.Control 
-          type="text" 
-          value={pfpImgUrl} 
-          onChange={(e) => setPfpImgUrl(e.target.value)} 
-          placeholder="https://example.com/image.jpg"
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={uploadStatus === 'uploading'}
         />
+        {uploadStatus === 'uploading' && (
+          <div className="mt-2"><Spinner animation="border" size="sm" /> 이미지 업로드 중...</div>
+        )}
+        {uploadStatus === 'success' && pfpImgUrl && (
+          <div className="mt-2 text-success">업로드 완료! {/* <a href={pfpImgUrl} target="_blank" rel="noopener noreferrer">이미지 보기</a>*/}</div>
+        )}
+        {uploadStatus === 'error' && (
+          <div className="mt-2 text-danger">{uploadError}</div>
+        )}
+        {/* {pfpImgUrl && uploadStatus !== 'success' && (
+          <div className="mt-2">현재 이미지: <a href={pfpImgUrl} target="_blank" rel="noopener noreferrer">{pfpImgUrl}</a></div>
+        )} */}
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formIgUrl">
@@ -62,7 +94,7 @@ function UserProfileEditForm({ userId, token, initialData, onUpdateSuccess }) {
         />
       </Form.Group>
 
-      <Button variant="primary" type="submit">
+      <Button variant="primary" type="submit" disabled={uploadStatus === 'uploading'}>
         프로필 저장
       </Button>
     </Form>
