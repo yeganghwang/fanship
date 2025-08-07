@@ -134,8 +134,7 @@ export class PostService {
       throw new NotFoundException(`Post with ID ${postId} not found or not visible`);
     }
 
-    post.views += 1;
-    await this.postRepository.save(post);
+    await this.postRepository.increment({ id: postId }, 'views', 1);
 
     return {
       post_id: post.id,
