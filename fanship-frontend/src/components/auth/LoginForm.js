@@ -1,20 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { login } from '../../api/auth';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 function LoginForm({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const recaptchaRef = useRef(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await login({ username, password });
+      const recaptchaToken = await recaptchaRef.current.executeAsync();
+      if (!recaptchaToken) {
+        setMessage('reCAPTCHA 인증을 완료해주세요.');
+        return;
+      }
+      const data = await login({ 
+        username, 
+        password,
+        recaptchaToken 
+      });
       onLoginSuccess(data);
     } catch (error) {
       setMessage(`로그인 실패: ${error.message || '알 수 없는 오류'}`);
+      recaptchaRef.current.reset();
     }
   };
 
@@ -22,10 +34,10 @@ function LoginForm({ onLoginSuccess }) {
     <>
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3" controlId="formBasicUsername">
-          <Form.Label>사용자 이름</Form.Label>
+          <Form.Label>아이디</Form.Label>
           <Form.Control
             type="text"
-            placeholder="사용자 이름을 입력하세요"
+            placeholder="아이디를 입력하세요"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -42,6 +54,14 @@ function LoginForm({ onLoginSuccess }) {
             required
           />
         </Form.Group>
+
+        <div className="mb-3">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+            size="invisible"
+          />
+        </div>
 
         <Button variant="primary" type="submit" className="w-100">
           로그인

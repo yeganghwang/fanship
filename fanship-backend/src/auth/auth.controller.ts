@@ -7,20 +7,48 @@ import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
 import { PasswordResetConfirmDto } from './dto/password-reset-confirm.dto';
 import { User } from '../user/user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import axios from 'axios';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // Google reCAPTCHA 검증 함수
+  async verifyRecaptcha(token: string): Promise<boolean> {
+    const secret = process.env.RECAPTCHA_SECRET_KEY;
+    if (!secret) throw new Error('reCAPTCHA secret key not set');
+    try {
+      const res = await axios.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        null,
+        {
+          params: {
+            secret,
+            response: token,
+          },
+        }
+      );
+      return res.data.success;
+    } catch (err) {
+      return false;
+    }
+  }
+
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async register(@Body() createUserDto: CreateUserDto & { recaptchaToken?: string }): Promise<User> {
+    if (!createUserDto.recaptchaToken || !(await this.verifyRecaptcha(createUserDto.recaptchaToken))) {
+      throw new UnauthorizedException('reCAPTCHA 검증 실패');
+    }
     return this.authService.register(createUserDto);
   }
 
   @Post('login')  
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(@Body() loginUserDto: LoginUserDto & { recaptchaToken?: string }) {
+    if (!loginUserDto.recaptchaToken || !(await this.verifyRecaptcha(loginUserDto.recaptchaToken))) {
+      throw new UnauthorizedException('reCAPTCHA 검증 실패');
+    }
     return this.authService.login(loginUserDto);
   }
 

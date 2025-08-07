@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Form, Button, Card, Alert, Row, Col } from 'react-bootstrap';
 import { register } from '../../api/auth';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 function RegisterForm({ onRegisterSuccess }) {
   const [username, setUsername] = useState('');
@@ -8,6 +9,7 @@ function RegisterForm({ onRegisterSuccess }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [mail, setMail] = useState('');
   const [nickname, setNickname] = useState('');
+  const recaptchaRef = useRef(null);
   const [position, setPosition] = useState('fan');
   const [message, setMessage] = useState('');
   const [passwordMatchError, setPasswordMatchError] = useState(false);
@@ -42,7 +44,19 @@ function RegisterForm({ onRegisterSuccess }) {
     }
 
     try {
-      const userData = { username, password, mail, nickname, position };
+      const recaptchaToken = await recaptchaRef.current.executeAsync();
+      if (!recaptchaToken) {
+        setMessage('reCAPTCHA 인증을 완료해주세요.');
+        return;
+      }
+      const userData = { 
+        username, 
+        password, 
+        mail, 
+        nickname, 
+        position,
+        recaptchaToken 
+      };
       const data = await register(userData);
       setMessage('');
       alert(`회원가입 성공: ${data.username}님, 환영합니다!`);
@@ -51,6 +65,7 @@ function RegisterForm({ onRegisterSuccess }) {
       }
     } catch (error) {
       setMessage(`회원가입 실패: ${error.message || '알 수 없는 오류'}`);
+      recaptchaRef.current.reset();
     }
   };
 
@@ -64,10 +79,10 @@ function RegisterForm({ onRegisterSuccess }) {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3" controlId="formRegisterUsername">
-                <Form.Label>사용자 이름</Form.Label>
+                <Form.Label>아이디</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="사용자 이름"
+                  placeholder="로그인 시 아이디"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -136,6 +151,14 @@ function RegisterForm({ onRegisterSuccess }) {
               <option value="celeb">셀럽</option>
             </Form.Select>
           </Form.Group>
+
+          <div className="mb-3">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+              size="invisible"
+            />
+          </div>
 
           <Button variant="primary" type="submit" className="w-100" disabled={isSubmitDisabled}>
             회원가입
