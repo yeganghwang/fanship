@@ -87,7 +87,7 @@ function App() {
               <Route path="/users/:userId" element={<PublicProfilePage />} />
               <Route path="/companies" element={<CompanyListPage />} />
               <Route path="/companies/:companyId" element={<CompanyDetailPage userId={userId} token={token} />} />
-              <Route path="/celebs/:celebId" element={<CelebDetailPage userId={userId} token={token} />} />
+              <Route path="/celebs/:celebId" element={<CelebDetailPage userId={userId} token={token} position={position} />} />
               <Route path="/favorites" element={<FavoriteListPage userId={userId} token={token} />} />
               <Route path="/posts" element={<PostListPage />} />
               <Route path="/posts/create" element={<PostCreatePage token={token} />} />

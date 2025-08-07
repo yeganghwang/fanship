@@ -5,15 +5,20 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { getCelebDetail } from '../api/celeb';
 import { addFavorite, removeFavorite, getFavorites } from '../api/favorite';
 import { getPostsByUserId } from '../api/post';
+import { getGoodsByUserId } from '../api/goods';
+import ScheduleList from '../components/schedule/ScheduleList';
+import ScheduleForm from '../components/schedule/ScheduleForm';
 
-function CelebDetailPage({ userId, token }) {
+function CelebDetailPage({ userId, token, position }) {
   const { celebId } = useParams();
   const [celebDetail, setCelebDetail] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [goods, setGoods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState(null);
+  const [scheduleUpdate, setScheduleUpdate] = useState(0);
 
   const checkFavoriteStatus = async () => {
     if (!userId || !token) return;
@@ -32,34 +37,37 @@ function CelebDetailPage({ userId, token }) {
     }
   };
 
-  useEffect(() => {
-    const fetchCelebData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const celebResponse = await getCelebDetail(celebId);
-        setCelebDetail(celebResponse);
+  const fetchCelebData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const celebResponse = await getCelebDetail(celebId);
+      setCelebDetail(celebResponse);
 
-        if (celebResponse && celebResponse.user_id) {
-          const postsResponse = await getPostsByUserId(celebResponse.user_id);
-          setPosts(postsResponse.list);
-        }
+      if (celebResponse && celebResponse.user_id) {
+        const postsResponse = await getPostsByUserId(celebResponse.user_id);
+        setPosts(postsResponse.list);
 
-        if (userId && token) {
-          await checkFavoriteStatus();
-        }
-
-      } catch (err) {
-        setError(err.message || '데이터를 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
+        const goodsResponse = await getGoodsByUserId(celebResponse.user_id);
+        setGoods(goodsResponse.list);
       }
-    };
 
+      if (userId && token) {
+        await checkFavoriteStatus();
+      }
+
+    } catch (err) {
+      setError(err.message || '데이터를 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (celebId) {
       fetchCelebData();
     }
-  }, [celebId, userId, token]);
+  }, [celebId, userId, token, scheduleUpdate]);
 
   const handleFavoriteToggle = async () => {
     if (!token) {
@@ -78,6 +86,12 @@ function CelebDetailPage({ userId, token }) {
     } catch (err) {
       alert(`작업 실패: ${err.message || '알 수 없는 오류'}`);
     }
+  };
+
+  const canManageSchedule = () => {
+    if (!userId) return false;
+    if (position === 'manager' || position === 'developer') return true;
+    return celebDetail && celebDetail.user_id === parseInt(userId, 10);
   };
 
   if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
@@ -113,9 +127,19 @@ function CelebDetailPage({ userId, token }) {
               </ListGroup>
             </Card.Body>
           </Card>
+
+          <Card className="mb-3">
+            <Card.Header as="h5">스케줄</Card.Header>
+            <Card.Body>
+              {canManageSchedule() && (
+                <ScheduleForm celebId={celebId} token={token} onScheduleCreated={() => setScheduleUpdate(Date.now())} />
+              )}
+              <ScheduleList celebId={celebId} token={token} canManage={canManageSchedule()} />
+            </Card.Body>
+          </Card>
         </Col>
         <Col md={8}>
-          <Card>
+          <Card className="mb-3">
             <Card.Header as="h5">작성한 게시글</Card.Header>
             <ListGroup variant="flush">
               {posts.length > 0 ? (
@@ -126,6 +150,21 @@ function CelebDetailPage({ userId, token }) {
                 ))
               ) : (
                 <ListGroup.Item>작성한 게시글이 없습니다.</ListGroup.Item>
+              )}
+            </ListGroup>
+          </Card>
+
+          <Card>
+            <Card.Header as="h5">등록한 굿즈</Card.Header>
+            <ListGroup variant="flush">
+              {goods.length > 0 ? (
+                goods.map(item => (
+                  <LinkContainer to={`/goods/${item.goods_id}`} key={item.goods_id}>
+                    <ListGroup.Item action>{item.title}</ListGroup.Item>
+                  </LinkContainer>
+                ))
+              ) : (
+                <ListGroup.Item>등록한 굿즈가 없습니다.</ListGroup.Item>
               )}
             </ListGroup>
           </Card>

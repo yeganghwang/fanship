@@ -133,7 +133,24 @@
 - `src/pages/GoodsEditPage.js`에 굿즈 수정 페이지 구현.
 - `App.js`에 굿즈 관련 라우팅 추가 (`/goods`, `/goods/create`, `/goods/:goodsId`, `/goods/:goodsId/edit`).
 
-### 24. 다음 작업: 스케줄 관련 기능 구현
-- `api/schedule.js` 파일 생성 예정.
-- `src/components/schedule` 디렉토리 생성 예정.
-- `src/pages/SchedulePage.js` 등 페이지 생성 예정.
+### 24. 셀럽 상세 페이지 굿즈 목록 표시 기능 추가 완료
+- `CelebDetailPage.js`에 해당 셀럽이 등록한 굿즈 목록을 표시하는 기능 추가.
+
+### 25. 스케줄 관련 기능 구현 완료
+- `api/schedule.js` 파일 생성 및 스케줄 CRUD API 함수 구현.
+- `src/components/schedule` 디렉토리 생성.
+- `src/components/schedule/ScheduleList.js`에 스케줄 목록 표시 및 권한에 따른 삭제 버튼 구현.
+- `src/components/schedule/ScheduleForm.js`에 스케줄 등록 폼 구현.
+- `CelebDetailPage.js`에 스케줄 목록 및 등록 폼 추가, 권한에 따른 관리 버튼 표시.
+
+### 26. 스케줄 등록 UI 개선 완료
+- `src/components/schedule/ScheduleForm.js`에서 시간 입력을 드롭다운으로 변경하여 사용자 경험 개선.
+
+### 27. 메인 홈페이지 개편 완료
+- `HomePage.js`에서 디버깅용 사용자 정보 제거.
+- 셀럽 로그인 시 "마이 페이지"로 이동하는 카드 추가.
+- 최신 게시글, 주요 회사, 인기 굿즈 목록을 Bootstrap 카드로 표시.
+
+### 28. 다음 작업: 로그인 기록 기능 구현
+- `api/log.js` 파일 생성 예정.
+- 로그인 성공 시 로그인 기록 API 호출 로직 추가 예정.
