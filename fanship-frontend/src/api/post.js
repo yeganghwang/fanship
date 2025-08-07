@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -73,3 +74,13 @@ export const deletePost = async (postId, token) => {
     throw error.response.data;
   }
 };
+
+function PostDetail({ postId }) {
+  const [post, setPost] = useState(null);
+
+  useEffect(() => {
+    getPost(postId).then(setPost);
+  }, [postId]); // 의존성 배열에 postId만 넣기
+
+  // ...existing code...
+}

@@ -112,29 +112,22 @@ export class PostService {
     };
   }
 
-  async findOneById(postId: number): Promise<any> {
+  async findOneById(postId: number, increaseView = true): Promise<any> {
+    if (increaseView) {
+      await this.postRepository.increment({ id: postId }, 'views', 1);
+    }
+
+    // 전체 필드 조회
     const post = await this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.writer', 'user')
       .where('post.id = :postId', { postId })
       .andWhere('post.visible = :visible', { visible: true })
-      .select([
-        'post.id',
-        'post.writerId',
-        'user.nickname',
-        'post.title',
-        'post.content',
-        'post.createdAt',
-        'post.views',
-        'post.notice',
-      ])
       .getOne();
 
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found or not visible`);
     }
-
-    await this.postRepository.increment({ id: postId }, 'views', 1);
 
     return {
       post_id: post.id,

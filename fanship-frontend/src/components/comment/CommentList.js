@@ -11,7 +11,13 @@ function CommentList({ postId, userId, token, position }) {
   const [limit, setLimit] = useState(20);
   const [totalPages, setTotalPages] = useState(1);
 
+  // postId가 바뀔 때 page를 1로 초기화 (새 게시글 이동 시 중복 호출 방지)
   useEffect(() => {
+    setPage(1);
+  }, [postId]);
+
+  useEffect(() => {
+    if (!postId) return;
     const fetchComments = async () => {
       setLoading(true);
       setError(null);
@@ -25,10 +31,7 @@ function CommentList({ postId, userId, token, position }) {
         setLoading(false);
       }
     };
-
-    if (postId) {
-      fetchComments();
-    }
+    fetchComments();
   }, [postId, page, limit]);
 
   const handleDelete = async (commentId) => {

@@ -44,7 +44,7 @@ export class CommentService {
   }
 
   async findCommentsByPostId(postId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
-    const post = await this.postService.findOneById(postId);
+    const post = await this.postService.findOneById(postId, false);
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
