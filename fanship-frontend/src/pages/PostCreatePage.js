@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card } from 'react-bootstrap';
 import { createPost } from '../api/post';
 import PostForm from '../components/post/PostForm';
 
@@ -17,10 +18,14 @@ function PostCreatePage({ token }) {
   };
 
   return (
-    <div>
-      <h1>새 게시글 작성</h1>
-      <PostForm onSubmit={handleSubmit} />
-    </div>
+    <>
+      <h1 className="mb-4">새 게시글 작성</h1>
+      <Card>
+        <Card.Body>
+          <PostForm onSubmit={handleSubmit} />
+        </Card.Body>
+      </Card>
+    </>
   );
 }
 

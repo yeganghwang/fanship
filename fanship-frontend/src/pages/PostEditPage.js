@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Card, Spinner, Alert } from 'react-bootstrap';
 import { getPost, updatePost } from '../api/post';
 import PostForm from '../components/post/PostForm';
 
@@ -13,6 +14,7 @@ function PostEditPage({ token }) {
   useEffect(() => {
     const fetchPost = async () => {
       setLoading(true);
+      setError(null);
       try {
         const response = await getPost(postId);
         setPost(response);
@@ -38,15 +40,19 @@ function PostEditPage({ token }) {
     }
   };
 
-  if (loading) return <div>로딩 중...</div>;
-  if (error) return <div>오류: {error}</div>;
-  if (!post) return <div>게시글을 찾을 수 없습니다.</div>;
+  if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
+  if (error) return <Alert variant="danger">{error}</Alert>;
+  if (!post) return <Alert variant="warning">게시글을 찾을 수 없습니다.</Alert>;
 
   return (
-    <div>
-      <h1>게시글 수정</h1>
-      <PostForm onSubmit={handleSubmit} initialData={post} />
-    </div>
+    <>
+      <h1 className="mb-4">게시글 수정</h1>
+      <Card>
+        <Card.Body>
+          <PostForm onSubmit={handleSubmit} initialData={post} isEdit={true} />
+        </Card.Body>
+      </Card>
+    </>
   );
 }
 
