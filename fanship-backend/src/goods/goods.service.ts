@@ -47,7 +47,7 @@ export class GoodsService {
     }
 
     if (sellerNickname !== undefined) {
-      query.andWhere('goods.sellerNickname = :sellerNickname', { sellerNickname });
+      query.andWhere('user.nickname LIKE :sellerNickname', { sellerNickname: `%${sellerNickname}%` });
     }
 
     // 총 개수 조회
