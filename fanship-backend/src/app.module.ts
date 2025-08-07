@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UploadsModule } from './uploads/uploads.module';
 import { User } from './user/user.entity';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -53,6 +54,7 @@ import { Comment } from './comment/comment.entity';
     GoodsModule,
     LoginLogModule,
     CommentModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
