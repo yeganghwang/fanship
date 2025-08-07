@@ -132,6 +132,7 @@ export class GoodsService {
         'goods.views',
         'goods.sold',
         'user.nickname',
+        'user.userId',
         'celeb.celeb_type',
         'company.company_name',
       ])
@@ -148,6 +149,7 @@ export class GoodsService {
       company_name: goods.seller.celeb?.company?.company_name || null,
       celeb_type: goods.seller.celeb?.celeb_type || null,
       seller_nickname: goods.seller.nickname,
+      seller_id: goods.seller.userId,
       title: goods.title,
       content: goods.content,
       price: Number(goods.price),
