@@ -5,12 +5,31 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 서버경로/fanship-frontend:latest
+    image: ${DOCKER_REGISTRY}/fanship-frontend:latest
     ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
-      - REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
-      - REACT_APP_RECAPTCHA_SITE_KEY=${REACT_APP_RECAPTCHA_SITE_KEY}
-    working_dir: /app
-    command: npm start
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+
+
+# version: '3.8'
+
+# services:
+#   frontend:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     image: 서버경로/fanship-frontend:latest
+#     ports:
+#       - "3000:3000"
+#     environment:
+#       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
+#       - REACT_APP_SERVER_URL=${REACT_APP_SERVER_URL}
+#       - REACT_APP_RECAPTCHA_SITE_KEY=${REACT_APP_RECAPTCHA_SITE_KEY}
+#     working_dir: /app
+#     command: npm start
+
+
+      
+      

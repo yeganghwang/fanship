@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: 서버경로/fanship-backend:latest
+    image: ${DOCKER_REGISTRY}/fanship-backend:latest
     container_name: fanship-api
     restart: unless-stopped
     ports:
