@@ -22,7 +22,7 @@ function GoodsCreatePage({ token }) {
       <h1 className="mb-4">새 굿즈 등록</h1>
       <Card>
         <Card.Body>
-          <GoodsForm onSubmit={handleSubmit} />
+          <GoodsForm onSubmit={handleSubmit} token={token} />
         </Card.Body>
       </Card>
     </>

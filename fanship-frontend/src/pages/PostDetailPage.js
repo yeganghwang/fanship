@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Spinner, Alert, ButtonGroup } from 'react-bootstrap';
+import DOMPurify from 'dompurify';
 import { getPost, deletePost } from '../api/post';
 import { formatToKST } from '../utils/date';
 import CommentList from '../components/comment/CommentList';
@@ -52,14 +53,16 @@ function PostDetailPage({ userId, token, position, companyId }) {
   };
 
   const handleCommentCreated = () => {
-    // CommentList will now refetch on its own, but we can trigger a refresh if needed
-    // For now, this can be simplified as CommentList is self-sufficient
-    fetchPostDetails(); // Or simply let CommentList handle its state
+    fetchPostDetails();
   };
 
   if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!post) return <Alert variant="warning">게시글을 찾을 수 없습니다.</Alert>;
+
+  // Sanitize the HTML content before rendering
+    const contentWithBreaks = post.content.replace(/\n/g, '<br />');
+  const cleanHtml = DOMPurify.sanitize(contentWithBreaks);
 
   return (
     <>
@@ -73,7 +76,7 @@ function PostDetailPage({ userId, token, position, companyId }) {
           </Card.Subtitle>
         </Card.Header>
         <Card.Body>
-          <div style={{ whiteSpace: 'pre-wrap', minHeight: '200px' }}>{post.content}</div>
+          <div className="post-content-view" dangerouslySetInnerHTML={{ __html: cleanHtml }} />
         </Card.Body>
         {canEditOrDelete() && (
           <Card.Footer className="text-end">

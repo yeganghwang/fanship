@@ -22,7 +22,7 @@ function PostCreatePage({ token }) {
       <h1 className="mb-4">새 게시글 작성</h1>
       <Card>
         <Card.Body>
-          <PostForm onSubmit={handleSubmit} />
+          <PostForm onSubmit={handleSubmit} token={token} />
         </Card.Body>
       </Card>
     </>

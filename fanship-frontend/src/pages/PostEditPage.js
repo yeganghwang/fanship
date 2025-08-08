@@ -49,7 +49,7 @@ function PostEditPage({ token }) {
       <h1 className="mb-4">게시글 수정</h1>
       <Card>
         <Card.Body>
-          <PostForm onSubmit={handleSubmit} initialData={post} isEdit={true} />
+          <PostForm onSubmit={handleSubmit} initialData={post} isEdit={true} token={token} />
         </Card.Body>
       </Card>
     </>

@@ -154,6 +154,16 @@
 ### 28. 회원가입 폼 개선 완료
 - `src/components/auth/RegisterForm.js`에서 셀럽 선택 시 회사 및 셀럽 유형 선택 드롭다운 추가.
 
-### 29. 다음 작업: 로그인 기록 기능 구현
+### 29. 게시글 이미지 첨부 기능 오류 수정 완료
+- `src/components/post/PostForm.js`의 이미지 업로드 로직을 `api/upload.js`의 `uploadImage` 함수에 맞게 수정.
+
+### 30. 게시글 이미지 렌더링 오류 수정 완료
+- `dompurify` 라이브러리 설치.
+- `PostDetailPage.js`에서 `DOMPurify`를 사용하여 HTML을 정화하고 `dangerouslySetInnerHTML`을 통해 안전하게 렌더링하도록 수정.
+
+### 31. 게시글 및 굿즈 내용 줄바꿈 오류 수정 완료
+- `PostDetailPage.js`와 `GoodsDetailPage.js`에서 렌더링 전에 `\n`을 `<br />`로 치환하여 줄바꿈이 올바르게 표시되도록 수정.
+
+### 32. 다음 작업: 로그인 기록 기능 구현
 - `api/log.js` 파일 생성 예정.
 - 로그인 성공 시 로그인 기록 API 호출 로직 추가 예정.

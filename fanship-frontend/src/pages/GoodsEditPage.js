@@ -49,7 +49,7 @@ function GoodsEditPage({ token }) {
       <h1 className="mb-4">굿즈 수정</h1>
       <Card>
         <Card.Body>
-          <GoodsForm onSubmit={handleSubmit} initialData={goods} isEdit={true} />
+          <GoodsForm onSubmit={handleSubmit} initialData={goods} isEdit={true} token={token} />
         </Card.Body>
       </Card>
     </>
