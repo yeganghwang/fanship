@@ -71,7 +71,8 @@ export class CompanyService {
     if (conditions.length > 0) {
       query.where(conditions.join(' AND '), parameters);
     }
-
+    // company_name 기준으로 정렬
+    query.orderBy('company.company_name', 'ASC');
     // 총 개수 조회
     const totalItems = await query.getCount();
 
