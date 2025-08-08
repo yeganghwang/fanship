@@ -1,10 +1,10 @@
-import axios from 'axios';
+import api from './axiosInstance';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + '/companies';
 
 export const createCompany = async (companyData, token) => {
   try {
-    const response = await axios.post(API_URL, companyData, {
+    const response = await api.post(API_URL, companyData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -17,7 +17,7 @@ export const createCompany = async (companyData, token) => {
 
 export const getCompanyList = async (params) => {
   try {
-    const response = await axios.get(API_URL, { params });
+    const response = await api.get(API_URL, { params });
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -26,7 +26,7 @@ export const getCompanyList = async (params) => {
 
 export const getCelebsByCompanyId = async (companyId, params) => {
   try {
-    const response = await axios.get(`${API_URL}/${companyId}/celebs`, { params });
+    const response = await api.get(`${API_URL}/${companyId}/celebs`, { params });
     return response.data;
   } catch (error) {
     throw error.response.data;

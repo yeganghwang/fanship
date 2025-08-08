@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './axiosInstance';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + '/uploads';
 const IMAGE_FILE_URL = process.env.REACT_APP_SERVER_URL; // .env에 정의된 서버 주소
@@ -18,7 +18,7 @@ export async function uploadImage(file, token) {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  const response = await axios.post(API_URL, formData, { headers });
+  const response = await api.post(API_URL, formData, { headers });
   if (response.data && response.data.url) {
     return IMAGE_FILE_URL + response.data.url; // 예: http://192.168.123.5:3000/uploads/파일명
   } else {

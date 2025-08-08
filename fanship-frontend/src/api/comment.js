@@ -1,11 +1,23 @@
-import axios from 'axios';
+import api from './axiosInstance';
+import { logout } from './auth'; // 로그아웃 함수 import
 
 const API_URL = process.env.REACT_APP_API_BASE_URL;
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response && error.response.status === 401) {
+      logout(); // 자동 로그아웃
+      window.location.href = '/login'; // 로그인 페이지로 이동
+    }
+    return Promise.reject(error);
+  }
+);
 
 // 4.6. 댓글 작성
 export const createComment = async (postId, content, token) => {
   try {
-    const response = await axios.post(`${API_URL}/posts/${postId}/comments`, { content }, {
+    const response = await api.post(`/posts/${postId}/comments`, { content }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -18,18 +30,14 @@ export const createComment = async (postId, content, token) => {
 
 // 4.7. 댓글 목록 조회
 export const getComments = async (postId, params) => {
-  try {
-    const response = await axios.get(`${API_URL}/posts/${postId}/comments`, { params });
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
+  const response = await api.get(`/posts/${postId}/comments`, { params });
+  return response.data;
 };
 
 // 4.8. 댓글 수정
 export const updateComment = async (commentId, content, token) => {
   try {
-    const response = await axios.patch(`${API_URL}/comments/${commentId}`, { content }, {
+    const response = await api.patch(`/comments/${commentId}`, { content }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,7 +51,7 @@ export const updateComment = async (commentId, content, token) => {
 // 4.9. 댓글 삭제
 export const deleteComment = async (commentId, token) => {
   try {
-    const response = await axios.delete(`${API_URL}/comments/${commentId}`, {
+    const response = await api.delete(`/comments/${commentId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
