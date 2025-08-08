@@ -8,7 +8,7 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response && error.response.status === 401) {
-      // 로그아웃 처리 (App 컴포넌트의 상태 관리 함수 등 호출)
+      // 로그아웃 처리
       localStorage.clear();
       window.location.href = '/login';
     }

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './axiosInstance';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + '/logins';
 
@@ -10,7 +10,7 @@ const API_URL = process.env.REACT_APP_API_BASE_URL + '/logins';
  */
 export const recordLogin = async (logData, token) => {
   try {
-    const response = await axios.post(API_URL, logData, {
+    const response = await api.post(API_URL, logData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

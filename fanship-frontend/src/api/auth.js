@@ -1,21 +1,12 @@
 import axios from 'axios';
+import apiWithAuth from './axiosInstance';
 
 const API_URL = process.env.REACT_APP_API_BASE_URL + '/auth'; // .env 파일에서 환경 변수 사용
 
+// 로그인/회원가입용 axios 인스턴스 (401 인터셉터 없음)
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
 });
-
-api.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response && error.response.status === 401) {
-      logout(); // 자동 로그아웃
-      window.location.href = '/login'; // 로그인 페이지로 이동
-    }
-    return Promise.reject(error);
-  }
-);
 
 export const register = async (userData) => {
   try {
@@ -37,7 +28,7 @@ export const login = async (credentials) => {
 
 export const logout = async (token) => {
   try {
-    const response = await api.post(`${API_URL}/logout`, {}, {
+    const response = await apiWithAuth.post(`${API_URL}/logout`, {}, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -68,7 +59,7 @@ export const passwordResetConfirm = async (token, newPassword) => {
 
 export const changePassword = async (currentPassword, newPassword, token) => {
   try {
-    const response = await api.post(`${API_URL}/change-password`, {
+    const response = await apiWithAuth.post(`${API_URL}/change-password`, {
       current_password: currentPassword,
       new_password: newPassword,
     }, {
