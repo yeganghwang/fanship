@@ -18,7 +18,8 @@ export const createCompany = async (companyData, token) => {
 export const getCompanyList = async (params) => {
   try {
     const response = await api.get(API_URL, { params });
-    return response.data;
+    const sortedList = response.data.list.sort((a, b) => a.company_name.localeCompare(b.company_name, 'ko'));
+    return { ...response.data, list: sortedList };
   } catch (error) {
     throw error.response.data;
   }
@@ -27,7 +28,9 @@ export const getCompanyList = async (params) => {
 export const getCelebsByCompanyId = async (companyId, params) => {
   try {
     const response = await api.get(`${API_URL}/${companyId}/celebs`, { params });
-    return response.data;
+    // 셀럽 리스트를 닉네임 기준 오름차순 정렬
+    const sortedList = response.data.list.sort((a, b) => a.nickname.localeCompare(b.nickname, 'ko'));
+    return { ...response.data, list: sortedList };
   } catch (error) {
     throw error.response.data;
   }
