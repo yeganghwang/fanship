@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Button, Spinner, Alert, ListGroup, Row, Col, Image } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { getCelebDetail } from '../api/celeb';
@@ -11,6 +11,7 @@ import ScheduleForm from '../components/schedule/ScheduleForm';
 
 function CelebDetailPage({ userId, token, position }) {
   const { celebId } = useParams();
+  const navigate = useNavigate();
   const [celebDetail, setCelebDetail] = useState(null);
   const [posts, setPosts] = useState([]);
   const [goods, setGoods] = useState([]);
@@ -88,7 +89,7 @@ function CelebDetailPage({ userId, token, position }) {
     }
   };
 
-  const canManageSchedule = () => {
+  const canManage = () => {
     if (!userId) return false;
     if (position === 'manager' || position === 'developer') return true;
     return celebDetail && celebDetail.user_id === parseInt(userId, 10);
@@ -102,11 +103,16 @@ function CelebDetailPage({ userId, token, position }) {
     <>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h1>{celebDetail.nickname}</h1>
-        {token && (
-          <Button variant={isFavorite ? "outline-danger" : "outline-primary"} onClick={handleFavoriteToggle}>
-            {isFavorite ? '★ 즐겨찾기 해제' : '☆ 즐겨찾기 추가'}
-          </Button>
-        )}
+        <div>
+          {canManage() && (
+            <Button variant="outline-secondary" onClick={() => navigate(`/profile`)} className="me-2">프로필 수정</Button>
+          )}
+          {token && (
+            <Button variant={isFavorite ? "outline-danger" : "outline-primary"} onClick={handleFavoriteToggle}>
+              {isFavorite ? '★ 즐겨찾기 해제' : '☆ 즐겨찾기 추가'}
+            </Button>
+          )}
+        </div>
       </div>
 
       <Row>
@@ -131,10 +137,10 @@ function CelebDetailPage({ userId, token, position }) {
           <Card className="mb-3">
             <Card.Header as="h5">스케줄</Card.Header>
             <Card.Body>
-              {canManageSchedule() && (
+              {canManage() && (
                 <ScheduleForm celebId={celebId} token={token} onScheduleCreated={() => setScheduleUpdate(Date.now())} />
               )}
-              <ScheduleList celebId={celebId} token={token} canManage={canManageSchedule()} />
+              <ScheduleList celebId={celebId} token={token} canManage={canManage()} />
             </Card.Body>
           </Card>
         </Col>

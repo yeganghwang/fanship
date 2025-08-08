@@ -76,6 +76,7 @@ function App() {
               <Route path="/" element={
                 <HomePage
                   userId={userId}
+                  token={token}
                   position={position}
                   companyId={companyId}
                   celebId={celebId}

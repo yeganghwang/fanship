@@ -4,11 +4,13 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { getPosts } from '../api/post';
 import { getCompanyList } from '../api/company';
 import { getGoodsList } from '../api/goods';
+import { getFavorites } from '../api/favorite';
 
-function HomePage({ userId, position, celebId }) {
+function HomePage({ userId, token, position, celebId }) {
   const [recentPosts, setRecentPosts] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [recentGoods, setRecentGoods] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,7 +18,6 @@ function HomePage({ userId, position, celebId }) {
     const fetchHomePageData = async () => {
       setLoading(true);
       try {
-        // 여러 API를 동시에 호출하여 병렬로 데이터를 가져옵니다.
         const [postsResponse, companiesResponse, goodsResponse] = await Promise.all([
           getPosts({ limit: 5 }),
           getCompanyList({ limit: 5 }),
@@ -28,7 +29,7 @@ function HomePage({ userId, position, celebId }) {
         setRecentGoods(goodsResponse.list);
 
       } catch (err) {
-        setError(err.message || '홈페이지 데이터를 불러오는데 실패했습니다.');
+        setError(err.message || '데이터를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
@@ -37,12 +38,29 @@ function HomePage({ userId, position, celebId }) {
     fetchHomePageData();
   }, []);
 
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (userId && token) {
+        try {
+          const favoritesResponse = await getFavorites(userId, token, { limit: 5 });
+          setFavorites(favoritesResponse.list);
+        } catch (err) {
+          console.error('즐겨찾기 목록을 불러오는데 실패했습니다:', err);
+          setFavorites([]);
+        }
+      } else {
+        setFavorites([]); // 로그아웃 시 즐겨찾기 목록 초기화
+      }
+    };
+
+    fetchFavorites();
+  }, [userId, token]);
+
   if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
   if (error) return <Alert variant="danger">{error}</Alert>;
 
   return (
     <Container>
-      {/* 셀럽 전용 카드 */}
       {position === 'celeb' && celebId && (
         <Card className="text-center mb-4 bg-primary text-white">
           <Card.Body>
@@ -56,7 +74,6 @@ function HomePage({ userId, position, celebId }) {
       )}
 
       <Row>
-        {/* 최신 게시글 */}
         <Col md={6} className="mb-4">
           <Card>
             <Card.Header as="h5">최신 게시글</Card.Header>
@@ -79,7 +96,6 @@ function HomePage({ userId, position, celebId }) {
           </Card>
         </Col>
 
-        {/* 주요 회사 */}
         <Col md={6} className="mb-4">
           <Card>
             <Card.Header as="h5">주요 회사</Card.Header>
@@ -103,9 +119,8 @@ function HomePage({ userId, position, celebId }) {
         </Col>
       </Row>
 
-      {/* 인기 굿즈 */}
       <Row>
-        <Col>
+        <Col md={6} className="mb-4">
             <Card>
                 <Card.Header as="h5">인기 굿즈</Card.Header>
                 <ListGroup variant="flush">
@@ -126,6 +141,30 @@ function HomePage({ userId, position, celebId }) {
                 </Card.Footer>
             </Card>
         </Col>
+
+        {userId && (
+          <Col md={6} className="mb-4">
+            <Card>
+              <Card.Header as="h5">즐겨찾기</Card.Header>
+              <ListGroup variant="flush">
+                {favorites.length > 0 ? (
+                  favorites.map(fav => (
+                    <LinkContainer to={fav.company_id ? `/companies/${fav.company_id}` : `/celebs/${fav.celeb_id}`} key={fav.favorite_id}>
+                      <ListGroup.Item action>{fav.company_name || fav.celeb_nickname}</ListGroup.Item>
+                    </LinkContainer>
+                  ))
+                ) : (
+                  <ListGroup.Item>즐겨찾기한 항목이 없습니다.</ListGroup.Item>
+                )}
+              </ListGroup>
+              <Card.Footer className="text-end">
+                  <LinkContainer to="/favorites">
+                      <Button variant="secondary" size="sm">더보기</Button>
+                  </LinkContainer>
+              </Card.Footer>
+            </Card>
+          </Col>
+        )}
       </Row>
     </Container>
   );
