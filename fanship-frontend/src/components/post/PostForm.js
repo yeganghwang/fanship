@@ -7,12 +7,12 @@ function PostForm({ onSubmit, initialData = {}, isEdit = false }) {
   const [notice, setNotice] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
+    if (isEdit && initialData) {
       setTitle(initialData.title || '');
       setContent(initialData.content || '');
       setNotice(initialData.notice || false);
     }
-  }, [initialData]);
+  }, [isEdit, initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
