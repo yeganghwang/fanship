@@ -18,6 +18,9 @@ function RegisterForm({ onRegisterSuccess }) {
   const [message, setMessage] = useState('');
   const [passwordMatchError, setPasswordMatchError] = useState(false);
   const [passwordLengthError, setPasswordLengthError] = useState(false);
+  const [birthYear, setBirthYear] = useState('');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthDay, setBirthDay] = useState('');
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -68,14 +71,20 @@ function RegisterForm({ onRegisterSuccess }) {
         setMessage('reCAPTCHA 인증을 완료해주세요.');
         return;
       }
+      let dob = null;
+      if (birthYear && birthMonth && birthDay) {
+        dob = `${birthYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`;
+      }
       const userData = { 
         username, 
         password, 
         mail, 
         nickname, 
         position,
-        recaptchaToken 
+        dob,
+        recaptchaToken
       };
+      // ig_url, pfp_img_url 등은 추후 필요시 추가
       if (position === 'celeb') {
         userData.company_id = companyId;
         userData.celeb_type = celebType;
@@ -102,7 +111,7 @@ function RegisterForm({ onRegisterSuccess }) {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3" controlId="formRegisterUsername">
-                <Form.Label>아이디</Form.Label>
+                <Form.Label>아이디 *</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="로그인 시 아이디"
@@ -114,7 +123,7 @@ function RegisterForm({ onRegisterSuccess }) {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3" controlId="formRegisterNickname">
-                <Form.Label>닉네임</Form.Label>
+                <Form.Label>닉네임 *</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="닉네임"
@@ -127,7 +136,7 @@ function RegisterForm({ onRegisterSuccess }) {
           </Row>
 
           <Form.Group className="mb-3" controlId="formRegisterEmail">
-            <Form.Label>이메일</Form.Label>
+            <Form.Label>이메일 *</Form.Label>
             <Form.Control
               type="email"
               placeholder="이메일"
@@ -138,7 +147,7 @@ function RegisterForm({ onRegisterSuccess }) {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formRegisterPassword">
-            <Form.Label>비밀번호</Form.Label>
+            <Form.Label>비밀번호 *</Form.Label>
             <Form.Control
               type="password"
               placeholder="비밀번호"
@@ -153,7 +162,7 @@ function RegisterForm({ onRegisterSuccess }) {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formRegisterConfirmPassword">
-            <Form.Label>비밀번호 확인</Form.Label>
+            <Form.Label>비밀번호 확인 *</Form.Label>
             <Form.Control
               type="password"
               placeholder="비밀번호 확인"
@@ -168,7 +177,7 @@ function RegisterForm({ onRegisterSuccess }) {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="formRegisterPosition">
-            <Form.Label>사용자 유형</Form.Label>
+            <Form.Label>사용자 유형 *</Form.Label>
             <Form.Select value={position} onChange={(e) => setPosition(e.target.value)}>
               <option value="fan">팬</option>
               <option value="celeb">셀럽</option>
@@ -177,7 +186,40 @@ function RegisterForm({ onRegisterSuccess }) {
               팬은 콘텐츠 소비자, 셀럽은 콘텐츠 제작자를 의미합니다.<br />사장님은 개발자가 직접 계정을 만들어 드립니다.
             </Form.Text>
           </Form.Group>
-
+            <Form.Group className="mb-3" controlId="formRegisterDob">
+              <Form.Label>생년월일 (선택)</Form.Label>
+              <Row>
+                <Col>
+                  <Form.Select value={birthYear} onChange={e => setBirthYear(e.target.value)}>
+                    <option value="">년</option>
+                    <option value="9999">9999년 (비공개)</option>
+                    {Array.from({length: 100}, (_, i) => {
+                      const year = new Date().getFullYear() - i;
+                      return <option key={year} value={year}>{year}년</option>;
+                    })}
+                  </Form.Select>
+                </Col>
+                <Col>
+                  <Form.Select value={birthMonth} onChange={e => setBirthMonth(e.target.value)} disabled={birthYear === "9999"}>
+                    <option value="">월</option>
+                    {Array.from({length: 12}, (_, i) => (
+                      <option key={i+1} value={i+1}>{i+1}월</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+                <Col>
+                  <Form.Select value={birthDay} onChange={e => setBirthDay(e.target.value)} disabled={birthYear === "9999"}>
+                    <option value="">일</option>
+                    {Array.from({length: 31}, (_, i) => (
+                      <option key={i+1} value={i+1}>{i+1}일</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+              </Row>
+              <Form.Text className="text-muted">
+                생년 비공개를 원하는 경우, 9999년을 선택하세요.
+              </Form.Text>
+            </Form.Group>
           {position === 'celeb' && (
             <>
               <Form.Group className="mb-3" controlId="formRegisterCompany">

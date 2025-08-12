@@ -95,6 +95,11 @@ function CelebDetailPage({ userId, token, position }) {
     return celebDetail && celebDetail.user_id === parseInt(userId, 10);
   };
 
+  const isOwner = () => {
+    if (!userId) return false;
+    return celebDetail && celebDetail.user_id === parseInt(userId, 10);
+  }
+
   if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!celebDetail) return <Alert variant="warning">셀럽 정보를 찾을 수 없습니다.</Alert>;
@@ -104,7 +109,7 @@ function CelebDetailPage({ userId, token, position }) {
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h1>{celebDetail.nickname}</h1>
         <div>
-          {canManage() && (
+          {isOwner() && (
             <Button variant="outline-secondary" onClick={() => navigate(`/profile`)} className="me-2">프로필 수정</Button>
           )}
           {token && (

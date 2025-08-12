@@ -36,6 +36,7 @@ export class UserController {
       position: user.position,
       pfp_img_url: user.pfp_img_url,
       ig_url: user.ig_url,
+      dob: user.dob
     };
   }
 
