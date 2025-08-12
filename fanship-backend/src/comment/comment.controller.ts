@@ -36,13 +36,13 @@ export class CommentController {
     @Body() updateCommentDto: UpdateCommentDto,
     @Request() req,
   ): Promise<any> {
-    return this.commentService.updateComment(commentId, req.user.userId, updateCommentDto);
+    return this.commentService.updateComment(commentId, req.user.userId, req.user.position, updateCommentDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('comments/:commentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteComment(@Param('commentId') commentId: number, @Request() req): Promise<void> {
-    await this.commentService.deleteComment(commentId, req.user.userId);
+    await this.commentService.deleteComment(commentId, req.user.userId, req.user.position);
   }
 }

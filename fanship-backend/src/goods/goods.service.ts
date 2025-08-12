@@ -158,14 +158,14 @@ export class GoodsService {
     };
   }
 
-  async deleteGoods(goodsId: number, userId: number): Promise<void> {
+  async deleteGoods(goodsId: number, userId: number, userPosition: string): Promise<void> {
     const goods = await this.goodsRepository.findOne({ where: { id: goodsId } });
 
     if (!goods) {
       throw new NotFoundException(`Goods with ID ${goodsId} not found`);
     }
 
-    if (goods.sellerId !== userId) {
+    if (userPosition !== 'manager' && goods.sellerId !== userId) {
       throw new ForbiddenException('You are not authorized to delete this goods');
     }
 
@@ -173,14 +173,14 @@ export class GoodsService {
     await this.goodsRepository.save(goods);
   }
 
-  async updateGoods(goodsId: number, userId: number, updateGoodsDto: UpdateGoodsDto): Promise<any> {
+  async updateGoods(goodsId: number, userId: number, userPosition: string, updateGoodsDto: UpdateGoodsDto): Promise<any> {
     const goods = await this.goodsRepository.findOne({ where: { id: goodsId, visible: true } });
 
     if (!goods) {
       throw new NotFoundException(`Goods with ID ${goodsId} not found or not visible`);
     }
 
-    if (goods.sellerId !== userId) {
+    if (userPosition !== 'manager' && goods.sellerId !== userId) {
       throw new ForbiddenException('You are not authorized to update this goods');
     }
 

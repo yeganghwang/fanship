@@ -82,7 +82,7 @@ export class CommentService {
     };
   }
 
-  async updateComment(commentId: number, userId: number, updateCommentDto: UpdateCommentDto): Promise<any> {
+  async updateComment(commentId: number, userId: number, userPosition: string, updateCommentDto: UpdateCommentDto): Promise<any> {
     const comment = await this.commentRepository.findOne({ 
       where: { id: commentId, visible: true },
       relations: ['writer']
@@ -92,7 +92,7 @@ export class CommentService {
       throw new NotFoundException(`Comment with ID ${commentId} not found`);
     }
 
-    if (comment.writerId !== userId) {
+    if (userPosition !== 'manager' && comment.writerId !== userId) {
       throw new ForbiddenException('You are not authorized to update this comment');
     }
 
@@ -110,14 +110,14 @@ export class CommentService {
     };
   }
 
-  async deleteComment(commentId: number, userId: number): Promise<void> {
+  async deleteComment(commentId: number, userId: number, userPosition: string): Promise<void> {
     const comment = await this.commentRepository.findOne({ where: { id: commentId, visible: true } });
 
     if (!comment) {
       throw new NotFoundException(`Comment with ID ${commentId} not found`);
     }
 
-    if (comment.writerId !== userId) {
+    if (userPosition !== 'manager' && comment.writerId !== userId) {
       throw new ForbiddenException('You are not authorized to delete this comment');
     }
 

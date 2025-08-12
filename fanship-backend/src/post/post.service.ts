@@ -141,14 +141,14 @@ export class PostService {
     };
   }
 
-  async deletePost(postId: number, userId: number): Promise<void> {
+  async deletePost(postId: number, userId: number, userPosition: string): Promise<void> {
     const post = await this.postRepository.findOne({ where: { id: postId } });
 
     if (!post) {
       throw new NotFoundException(`Post with ID ${postId} not found`);
     }
 
-    if (post.writerId !== userId) {
+    if (userPosition !== 'manager' && post.writerId !== userId) {
       throw new ForbiddenException('You are not authorized to delete this post');
     }
 
@@ -156,7 +156,7 @@ export class PostService {
     await this.postRepository.save(post);
   }
 
-  async updatePost(postId: number, userId: number, updatePostDto: UpdatePostDto): Promise<any> {
+  async updatePost(postId: number, userId: number, userPosition: string, updatePostDto: UpdatePostDto): Promise<any> {
     const post = await this.postRepository.findOne({ 
       where: { id: postId, visible: true },
       relations: ['writer']
@@ -166,7 +166,7 @@ export class PostService {
       throw new NotFoundException(`Post with ID ${postId} not found or not visible`);
     }
 
-    if (post.writerId !== userId) {
+    if (userPosition !== 'manager' && post.writerId !== userId) {
       throw new ForbiddenException('You are not authorized to update this post');
     }
 

@@ -33,6 +33,6 @@ export class ScheduleController {
   @Delete('schedules/:scheduleId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteSchedule(@Param('scheduleId') scheduleId: number, @Request() req): Promise<void> {
-    await this.scheduleService.deleteSchedule(scheduleId, req.user.userId);
+    await this.scheduleService.deleteSchedule(scheduleId, req.user.userId, req.user.position);
   }
 } 

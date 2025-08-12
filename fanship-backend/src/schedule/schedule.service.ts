@@ -87,7 +87,7 @@ export class ScheduleService {
     };
   }
 
-  async deleteSchedule(scheduleId: number, userId: number): Promise<void> {
+  async deleteSchedule(scheduleId: number, userId: number, userPosition: string): Promise<void> {
     const schedule = await this.scheduleRepository.findOne({
       where: { id: scheduleId },
       relations: ['celeb'],
@@ -98,7 +98,7 @@ export class ScheduleService {
     }
 
     // 셀럽의 사용자 ID와 요청한 사용자 ID가 일치하는지 확인
-    if (schedule.celeb.userId !== userId) {
+    if (userPosition !== 'manager' && schedule.celeb.userId !== userId) {
       throw new ForbiddenException('You are not authorized to delete this schedule');
     }
 

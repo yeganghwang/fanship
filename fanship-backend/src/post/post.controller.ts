@@ -43,13 +43,13 @@ export class PostController {
     @Body() updatePostDto: UpdatePostDto,
     @Request() req,
   ): Promise<any> {
-    return this.postService.updatePost(postId, req.user.userId, updatePostDto);
+    return this.postService.updatePost(postId, req.user.userId, req.user.position, updatePostDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('postId') postId: number, @Request() req): Promise<void> {
-    await this.postService.deletePost(postId, req.user.userId);
+    await this.postService.deletePost(postId, req.user.userId, req.user.position);
   }
 }

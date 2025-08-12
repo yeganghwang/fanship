@@ -40,13 +40,13 @@ export class GoodsController {
     @Body() updateGoodsDto: UpdateGoodsDto,
     @Request() req,
   ): Promise<any> {
-    return this.goodsService.updateGoods(goodsId, req.user.userId, updateGoodsDto);
+    return this.goodsService.updateGoods(goodsId, req.user.userId, req.user.position, updateGoodsDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':goodsId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteGoods(@Param('goodsId') goodsId: number, @Request() req): Promise<void> {
-    await this.goodsService.deleteGoods(goodsId, req.user.userId);
+    await this.goodsService.deleteGoods(goodsId, req.user.userId, req.user.position);
   }
 }
