@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Unique, OneToOne, OneToMany } from 'typeorm';
 import { Celeb } from '../celeb/celeb.entity';
+import { Company } from '../company/company.entity'
 import { Comment } from '../comment/comment.entity';
 import { Goods } from '../goods/goods.entity';
 import { Expose, Transform, Exclude } from 'class-transformer';
@@ -50,6 +51,7 @@ export class User {
 
   @OneToMany(() => Comment, comment => comment.writer)
   comments: Comment[];
+
 
   @OneToMany(() => Goods, goods => goods.seller)
   goods: Goods[];

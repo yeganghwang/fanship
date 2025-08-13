@@ -6,6 +6,8 @@ import { getPost, deletePost } from '../api/post';
 import { formatToKST } from '../utils/date';
 import CommentList from '../components/comment/CommentList';
 import CommentForm from '../components/comment/CommentForm';
+import './PostDetailPage.css';
+import Avatar from '../components/common/Avatar';
 
 function PostDetailPage({ userId, token, position, companyId }) {
   const { postId } = useParams();
@@ -56,24 +58,65 @@ function PostDetailPage({ userId, token, position, companyId }) {
     fetchPostDetails();
   };
 
+  const handleWriterNavigate = () => {
+    if (!post) return;
+    if (post.celeb_id) navigate(`/celebs/${post.celeb_id}`);
+    else if (post.company_id) navigate(`/companies/${post.company_id}`);
+    else if (post.writer_id) navigate(`/users/${post.writer_id}`);
+  };
+
   if (loading) return <div className="text-center"><Spinner animation="border" /></div>;
   if (error) return <Alert variant="danger">{error}</Alert>;
   if (!post) return <Alert variant="warning">게시글을 찾을 수 없습니다.</Alert>;
 
   // Sanitize the HTML content before rendering
-    const contentWithBreaks = post.content.replace(/\n/g, '<br />');
+  const contentWithBreaks = post.content.replace(/\n/g, '<br />');
   const cleanHtml = DOMPurify.sanitize(contentWithBreaks);
+
+  // 작성자 메타 정보: 줄바꿈 방지 및 작은 화면 처리
+  // 요구사항: "작성자: 닉네임", "조회수: 13", "작성일: ..." 이 중간에 줄바꿈 되지 않게.
+  // 각 항목은 white-space: nowrap 으로 보호, 전체는 overflow-x: auto 로 작은 화면 대응.
+  const metaItems = [
+    { label: '작성자', value: post.nickname },
+    { label: '조회수', value: post.views },
+    { label: '작성일', value: formatToKST(post.created_at) },
+  ];
+
+  // 프로필 이미지 필드 후보 (백엔드 명명 불확실시 다중 시도)
+  const writerPfp = post.pfp_img_url || post.writer_pfp_img_url || post.user_pfp_img_url || null;
+  const writerClickable = !!(post.celeb_id || post.company_id || post.writer_id);
 
   return (
     <>
       <Card className="mb-4">
         <Card.Header>
-          <Card.Title as="h2">{post.title}</Card.Title>
-          <Card.Subtitle className="d-flex justify-content-between text-muted mt-2">
-            <span>작성자: {post.nickname}</span>
-            <span>조회수: {post.views}</span>
-            <span>작성일: {formatToKST(post.created_at)}</span>
-          </Card.Subtitle>
+          <Card.Title as="h2" className="mb-3" style={{ wordBreak: 'break-word' }}>{post.title}</Card.Title>
+          <div className="d-flex" style={{ gap: 16 }}>
+            <Avatar
+              url={writerPfp}
+              nickname={post.nickname}
+              size={52}
+              clickable={writerClickable}
+              onClick={writerClickable ? handleWriterNavigate : undefined}
+            />
+            <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
+              <div className="post-meta">
+                {metaItems.map(m => (
+                  <span
+                    key={m.label}
+                    className="post-meta-item"
+                    style={m.label === '작성자' && writerClickable ? { cursor: 'pointer' } : undefined}
+                    onClick={m.label === '작성자' && writerClickable ? handleWriterNavigate : undefined}
+                    role={m.label === '작성자' && writerClickable ? 'button' : undefined}
+                    tabIndex={m.label === '작성자' && writerClickable ? 0 : undefined}
+                    onKeyDown={m.label === '작성자' && writerClickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleWriterNavigate(); } } : undefined}
+                  >
+                    <strong>{m.label}:</strong>&nbsp;{m.value}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </Card.Header>
         <Card.Body>
           <div className="post-content-view" dangerouslySetInnerHTML={{ __html: cleanHtml }} />

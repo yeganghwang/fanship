@@ -1,0 +1,22 @@
+.post-meta {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap; /* allow whole items to wrap to next line */
+  align-items: center;
+}
+
+.post-meta-item {
+  white-space: nowrap; /* keep label+value together */
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* tighter spacing on very narrow screens */
+@media (max-width: 480px) {
+  .post-meta {
+    gap: 0.75rem;
+  }
+  .post-meta-item {
+    font-size: 0.75rem;
+  }
+}

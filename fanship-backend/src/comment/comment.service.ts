@@ -1,17 +1,23 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Comment } from './comment.entity';
 import { CreateCommentDto, UpdateCommentDto } from './dto/create-comment.dto';
 import { PostService } from '../post/post.service';
 import { UserService } from '../user/user.service';
 import { PaginatedResult, PaginationHelper } from '../common/interfaces/pagination.interface';
+import { Celeb } from '../celeb/celeb.entity';
+import { Company } from '../company/company.entity';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
+  @InjectRepository(Celeb)
+  private celebRepository: Repository<Celeb>,
+  @InjectRepository(Company)
+  private companyRepository: Repository<Company>,
     private postService: PostService,
     private userService: UserService,
   ) {}
@@ -65,14 +71,53 @@ export class CommentService {
 
     const comments = await query.getMany();
 
-    const list = comments.map(comment => ({
-      comment_id: comment.id,
-      post_id: comment.postId,
-      writer_id: comment.writerId,
-      nickname: comment.writer.nickname,
-      content: comment.content,
-      created_at: comment.createdAt.toISOString(),
-    }));
+    // 수집: celeb / ceo 사용자 ID 목록
+    const celebUserIds: number[] = [];
+    const ceoUserIds: number[] = [];
+    for (const c of comments) {
+      if (c.writer?.position === 'celeb') celebUserIds.push(c.writerId);
+      else if (c.writer?.position === 'ceo') ceoUserIds.push(c.writerId);
+    }
+
+    // 중복 제거
+    const uniq = (arr: number[]) => Array.from(new Set(arr));
+    const uniqueCelebUserIds = uniq(celebUserIds);
+    const uniqueCeoUserIds = uniq(ceoUserIds);
+
+    // 관련 ID 매핑 조회 (bulk)
+    const celebMap = new Map<number, number>(); // userId -> celebId
+    if (uniqueCelebUserIds.length) {
+      const celebs = await this.celebRepository.find({ where: { userId: In(uniqueCelebUserIds) } });
+      for (const celeb of celebs) celebMap.set(celeb.userId, celeb.celebId);
+    }
+
+    const companyMap = new Map<number, number>(); // userId -> companyId
+    if (uniqueCeoUserIds.length) {
+      const companies = await this.companyRepository.find({ where: { ceoId: In(uniqueCeoUserIds) } });
+      for (const company of companies) companyMap.set(company.ceoId, company.id);
+    }
+
+    const list = comments.map(comment => {
+      const writerPosition = comment.writer?.position;
+      const base: any = {
+        comment_id: comment.id,
+        post_id: comment.postId,
+        writer_id: comment.writerId,
+        writer_position: writerPosition,
+        nickname: comment.writer?.nickname,
+        pfp_img_url: comment.writer?.pfp_img_url,
+        content: comment.content,
+        created_at: comment.createdAt.toISOString(),
+      };
+      if (writerPosition === 'celeb') {
+        const celebId = celebMap.get(comment.writerId);
+        if (celebId) base.celeb_id = celebId;
+      } else if (writerPosition === 'ceo') {
+        const companyId = companyMap.get(comment.writerId);
+        if (companyId) base.company_id = companyId;
+      }
+      return base;
+    });
 
     const pagination = PaginationHelper.calculatePagination(totalItems, page, limit);
 
