@@ -122,7 +122,7 @@ function HomePage({ userId, token, position, celebId }) {
       <Row>
         <Col md={6} className="mb-4">
             <Card>
-                <Card.Header as="h5">인기 굿즈</Card.Header>
+                <Card.Header as="h5">최신 굿즈</Card.Header>
                 <ListGroup variant="flush">
                 {recentGoods.length > 0 ? (
                     recentGoods.map(item => (
