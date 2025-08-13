@@ -27,6 +27,9 @@ export default function Avatar({
   const baseStyle = {
     width: size,
     height: size,
+    minWidth: size,          // prevent horizontal shrink
+    minHeight: size,
+    aspectRatio: '1 / 1',    // keep square in modern browsers
     borderRadius: '50%',
     overflow: 'hidden',
     backgroundColor: '#f0f0f0',
@@ -35,6 +38,7 @@ export default function Avatar({
     justifyContent: 'center',
     border: border ? '1px solid #e2e2e2' : 'none',
     cursor: clickable ? 'pointer' : 'default',
+    flex: '0 0 auto',        // disable flex shrinking
     ...style,
   };
 
@@ -60,7 +64,13 @@ export default function Avatar({
         <img
           src={url}
           alt={nickname ? `${nickname} 프로필 이미지` : '프로필 이미지'}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            flex: 'none'
+          }}
           onError={() => setImgError(true)}
           loading="lazy"
         />

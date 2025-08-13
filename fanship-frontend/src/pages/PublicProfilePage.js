@@ -31,6 +31,14 @@ function PublicProfilePage() {
   if (!userProfile) return <Alert variant="warning" className="mt-4 text-center">사용자 정보를 찾을 수 없습니다.</Alert>;
 
   const { nickname, position, pfp_img_url, ig_url, dob } = userProfile;
+  const positionMap = {
+    ceo: '회사 대표',
+    celeb: '셀럽',
+    manager: '운영자',
+    developer: '개발자',
+    fan: '일반 사용자'
+  };
+  const positionLabel = positionMap[position] || '알 수 없음';
 
   return (
     <Container className="mt-4">
@@ -51,7 +59,7 @@ function PublicProfilePage() {
                   <strong>닉네임:</strong> {nickname}
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  <strong>사용자 유형:</strong> {position || 'N/A'}
+                  <strong>사용자 유형:</strong> {positionLabel || 'N/A'}
                 </ListGroup.Item>
                 {dob && (
                   <ListGroup.Item>

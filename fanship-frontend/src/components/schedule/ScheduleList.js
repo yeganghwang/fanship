@@ -45,13 +45,12 @@ function ScheduleList({ celebId, token, canManage }) {
     }
   };
 
-  // YYYY-MM-DD
-  const toKey = (d) => d.toISOString().slice(0, 10);
-  const dateOnlyKey = (iso) => {
-    const d = new Date(iso);
-    // 표준화(시차 보정 위해)
-    const local = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    return toKey(local);
+  // YYYY-MM-DD (로컬 기준)
+  const toKey = (d) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   };
 
   // 날짜 범위 포함 처리 (start~end 포함 모든 날짜)
@@ -135,7 +134,7 @@ function ScheduleList({ celebId, token, canManage }) {
           </thead>
           <tbody>
             {Array.from({ length: calendarCells.length / 7 }).map((_, rowIdx) => (
-              <tr key={rowIdx} style={{ height: 100 }}>
+              <tr key={rowIdx}> {/* 높이 고정 제거 -> 내용에 따라 늘어남 */}
                 {calendarCells.slice(rowIdx * 7, rowIdx * 7 + 7).map((dateObj, i) => {
                   if (!dateObj) return <td key={i} className="bg-light"></td>;
                   const key = toKey(dateObj);
@@ -163,7 +162,15 @@ function ScheduleList({ celebId, token, canManage }) {
                       </div>
                       <div className="mt-1" style={{ textAlign: 'left' }}>
                         {daySchedules.slice(0,3).map(s => (
-                          <div key={s.schedule_id} style={{ fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div
+                            key={s.schedule_id}
+                            style={{
+                              fontSize: 11,
+                              lineHeight: '1.2',
+                              whiteSpace: 'normal',      // 줄바꿈 허용
+                              wordBreak: 'break-word'     // 긴 단어 줄바꿈
+                            }}
+                          >
                             • {s.schedule_type}
                           </div>
                         ))}

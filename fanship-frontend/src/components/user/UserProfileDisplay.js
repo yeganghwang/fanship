@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Row, Col, ListGroup } from 'react-bootstrap';
+import Avatar from '../common/Avatar';
 
 function UserProfileDisplay({ userProfile }) {
   const { pfp_img_url, nickname } = userProfile;
@@ -13,7 +14,7 @@ function UserProfileDisplay({ userProfile }) {
           width: size,
           height: size,
           borderRadius: '50%',
-            overflow: 'hidden',
+          overflow: 'hidden',
           backgroundColor: '#f0f0f0',
           display: 'flex',
           alignItems: 'center',
@@ -40,7 +41,11 @@ function UserProfileDisplay({ userProfile }) {
   return (
     <Row>
       <Col md={4} className="text-center mb-3 mb-md-0">
-        <Avatar url={pfp_img_url} nickname={nickname} />
+        <Avatar
+          url={pfp_img_url}
+          nickname={nickname}
+          size={120}
+        />
       </Col>
       <Col md={8}>
         <h3 style={{ wordBreak: 'break-word' }}>{nickname}</h3>

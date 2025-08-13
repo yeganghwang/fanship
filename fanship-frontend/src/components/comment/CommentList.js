@@ -89,8 +89,8 @@ function CommentList({ postId, userId, token, position }) {
           comments.map((comment) => {
             const clickable = (comment.celeb_id || comment.company_id || comment.writer_id);
             return (
-              <ListGroup.Item key={comment.comment_id} className="d-flex">
-                <Avatar
+              <ListGroup.Item key={comment.comment_id} className="d-flex align-items-center">
+                <Avatar 
                   url={comment.pfp_img_url}
                   nickname={comment.nickname}
                   size={44}
