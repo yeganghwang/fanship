@@ -12,7 +12,7 @@ export class ScheduleService {
     @InjectRepository(Schedule)
     private scheduleRepository: Repository<Schedule>,
     private celebService: CelebService,
-  ) {}
+  ) { }
 
   async findSchedulesByCelebId(celebId: number, page: number = 1, limit: number = 20): Promise<PaginatedResult<any>> {
     const celeb = await this.celebService.findOneById(celebId);
@@ -50,18 +50,20 @@ export class ScheduleService {
     };
   }
 
-  async createSchedule(celebId: number, createScheduleDto: CreateScheduleDto, userId: number): Promise<any> {
-    // 권한 확인: 해당 사용자가 셀럽인지 확인
-    const userCeleb = await this.celebService.findCelebByUserId(userId);
-    if (!userCeleb) {
-      throw new ForbiddenException('You are not a celeb');
-    }
+  async createSchedule(celebId: number, createScheduleDto: CreateScheduleDto, userId: number, userPosition: string): Promise<any> {
+    
+    if (userPosition !== "manager") {
+      // 권한 확인: 해당 사용자가 셀럽인지 확인
+      const userCeleb = await this.celebService.findCelebByUserId(userId);
+      if (!userCeleb) {
+        throw new ForbiddenException('You are not a celeb');
+      }
 
-    // 해당 사용자가 요청한 셀럽의 소유자인지 확인
-    if (userCeleb.celebId !== celebId) {
-      throw new ForbiddenException('You are not authorized to create schedule for this celeb');
+      // 해당 사용자가 요청한 셀럽의 소유자인지 확인
+      if (userCeleb.celebId !== celebId) {
+        throw new ForbiddenException('You are not authorized to create schedule for this celeb');
+      }
     }
-
     // 셀럽 존재 여부 확인 (권한 확인 후)
     const celeb = await this.celebService.findOneById(celebId);
     if (!celeb) {

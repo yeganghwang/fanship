@@ -17,7 +17,7 @@ export class ScheduleController {
     @Body() createScheduleDto: CreateScheduleDto,
     @Request() req,
   ): Promise<any> {
-    return this.scheduleService.createSchedule(Number(celebId), createScheduleDto, req.user.userId);
+    return this.scheduleService.createSchedule(Number(celebId), createScheduleDto, req.user.userId, req.user.position);
   }
 
   @Get(':celebId/schedules')
