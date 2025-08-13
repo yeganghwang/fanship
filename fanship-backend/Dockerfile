@@ -3,6 +3,14 @@ FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
+# Optional build args (not strictly needed unless build-time config embedding is required)
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_USERNAME
+ARG DB_PASSWORD
+ARG JWT_SECRET
+ARG RECAPTCHA_SECRET_KEY
+
 COPY package*.json ./
 RUN npm ci
 
