@@ -99,11 +99,10 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
           script: |
-            bash -c "
+            export PATH=$PATH:/usr/local/bin
             docker login ${{ secrets.DOCKER_REGISTRY }} -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             docker pull ${{ secrets.DOCKER_REGISTRY }}/fanship-backend:latest
             docker pull ${{ secrets.DOCKER_REGISTRY }}/fanship-frontend:latest
             cd ${{ secrets.DEPLOY_PATH }}
             docker compose down
             docker compose up -d --pull=always --force-recreate
-            "
