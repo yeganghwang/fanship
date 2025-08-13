@@ -44,7 +44,7 @@ function ScheduleForm({ celebId, token, onScheduleCreated }) {
           className="form-control"
           value={scheduleType}
           onChange={(e) => setScheduleType(e.target.value)}
-          placeholder="스케줄 종류"
+          placeholder="스케줄 종류(예 : 출근)"
           required
         />
       </div>
