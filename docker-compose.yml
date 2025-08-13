@@ -3,7 +3,7 @@ services:
     build:
       context: ./fanship-backend
       dockerfile: Dockerfile
-    image: docker.yegangs.com/fanship-backend:latest
+    image: ${DOCKER_REGISTRY}/fanship-backend:latest
     container_name: fanship-api
     restart: unless-stopped
     env_file:
@@ -19,7 +19,7 @@ services:
         REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
         REACT_APP_SERVER_URL: ${REACT_APP_SERVER_URL}
         REACT_APP_RECAPTCHA_SITE_KEY: ${REACT_APP_RECAPTCHA_SITE_KEY}
-    image: docker.yegangs.com/fanship-frontend:latest
+    image: ${DOCKER_REGISTRY}/fanship-frontend:latest
     container_name: fanship-frontend
     restart: unless-stopped
   # runtime env_file removed: CRA variables come from root .env at build time.
