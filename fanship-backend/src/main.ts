@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // 간단 민감정보 마스킹 & 트렁케이션 유틸 (main.ts 내부에만 유지)
-const SENSITIVE_KEYS = ['password','pass','pwd','token','authorization','auth','secret'];
+const SENSITIVE_KEYS = ['password', 'pass', 'pwd', 'token', 'authorization', 'auth', 'secret'];
 function sanitizeBody(raw: any): any {
   if (!raw || typeof raw !== 'object') return raw;
   const clone: any = Array.isArray(raw) ? [] : {};
@@ -17,7 +17,7 @@ function sanitizeBody(raw: any): any {
     } else if (v && typeof v === 'object') {
       clone[k] = sanitizeBody(v);
     } else if (typeof v === 'string') {
-      clone[k] = v.length > 300 ? v.slice(0,300) + '...(truncated)' : v;
+      clone[k] = v.length > 300 ? v.slice(0, 300) + '...(truncated)' : v;
     } else {
       clone[k] = v;
     }
@@ -53,21 +53,23 @@ async function bootstrap() {
         const status = res.statusCode;
         const bytes = res.getHeader && res.getHeader('content-length');
         let body: any = undefined;
-        if (['POST','PUT','PATCH'].includes(method) && req.headers['content-type']?.includes('application/json')) {
+        if (['POST', 'PUT', 'PATCH'].includes(method) && req.headers['content-type']?.includes('application/json')) {
           body = sanitizeBody(req.body);
         }
+        let logTime = new Date(Date.now() + 9 * 3600 * 1000).toISOString().replace('T', ' ').replace('Z', '');
+        console.log(logTime);
         const lineObj: any = {
-          time: new Date().toISOString(),
+          time: logTime,
           ip,
-            method,
-            url,
-            status,
-            durMs: duration,
-            bytes: bytes ? Number(bytes) : undefined,
-            ua,
-            ref: referer,
-            query: Object.keys(req.query || {}).length ? req.query : undefined,
-            body
+          method,
+          url,
+          status,
+          durMs: duration,
+          bytes: bytes ? Number(bytes) : undefined,
+          ua,
+          ref: referer,
+          query: Object.keys(req.query || {}).length ? req.query : undefined,
+          body
         };
         // 빈 키 제거
         Object.keys(lineObj).forEach(k => (lineObj[k] === undefined || (typeof lineObj[k] === 'object' && lineObj[k] && !Object.keys(lineObj[k]).length)) && delete lineObj[k]);
