@@ -1,7 +1,8 @@
-import { formatInTimeZone } from 'date-fns-tz';
+import { format } from 'date-fns';
 
 export const formatToKST = (dateString) => {
   if (!dateString) return '';
-  // UTC 시간을 한국 시간으로 변환하고, 원하는 형식으로 포맷합니다.
-  return formatInTimeZone(dateString, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
+  // Z(UTC) 제거: "2025-08-08T17:45:11.000Z" → "2025-08-08T17:45:11.000"
+  const localString = dateString.replace(/Z$/, '');
+  return format(new Date(localString), 'yyyy-MM-dd HH:mm:ss');
 };
