@@ -57,7 +57,6 @@ async function bootstrap() {
           body = sanitizeBody(req.body);
         }
         let logTime = new Date(Date.now() + 9 * 3600 * 1000).toISOString().replace('T', ' ').replace('Z', '');
-        console.log(logTime);
         const lineObj: any = {
           time: logTime,
           ip,

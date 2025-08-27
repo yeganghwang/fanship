@@ -23,9 +23,10 @@ export class ScheduleService {
     const query = this.scheduleRepository
       .createQueryBuilder('schedule')
       .where('schedule.celebId = :celebId', { celebId })
-      .orderBy('schedule.start_dt', 'ASC');
+      .orderBy('schedule.start_dt', 'DESC');
 
     // 총 개수 조회
+
     const totalItems = await query.getCount();
 
     // 페이지네이션 적용
