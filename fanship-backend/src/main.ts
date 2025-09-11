@@ -53,9 +53,11 @@ async function bootstrap() {
         const status = res.statusCode;
         const bytes = res.getHeader && res.getHeader('content-length');
         let body: any = undefined;
+
         if (['POST', 'PUT', 'PATCH'].includes(method) && req.headers['content-type']?.includes('application/json')) {
           body = sanitizeBody(req.body);
         }
+        
         let logTime = new Date(Date.now() + 9 * 3600 * 1000).toISOString().replace('T', ' ').replace('Z', '');
         const lineObj: any = {
           time: logTime,
